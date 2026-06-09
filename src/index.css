@@ -146,3 +146,24 @@ body {
 .bracket-nav-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Mobile touch improvements */
+@media (max-width: 639px) {
+  .bracket-scroll-container {
+    scroll-snap-type: x proximity;
+  }
+  .bracket-round-column {
+    scroll-snap-align: center;
+  }
+}
+
+/* Prevent text overflow globally */
+h1, h2, h3, h4, p, span, button {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Smooth column width transitions */
+.bracket-round-column {
+  transition: width 0.3s ease;
+}
