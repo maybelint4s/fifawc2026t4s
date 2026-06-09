@@ -106,7 +106,8 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   const scrollToRound = useCallback(
     (roundKey: string) => {
       setActiveRound(roundKey);
-      setFocusMode(true);
+      // Clicking "Grupos" resets to the initial full-tree view (zoom out)
+      setFocusMode(roundKey !== "FG");
       const col = columnRefs.current.get(roundKey);
       const container = scrollRef.current;
       if (!col || !container) return;

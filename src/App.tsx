@@ -5,6 +5,7 @@ import { Leaderboard } from "./components/Leaderboard";
 import { ControlCenter } from "./components/ControlCenter";
 import { GroupTables } from "./components/GroupTables";
 import { BracketTree } from "./components/BracketTree";
+import { FloatingMascot } from "./components/FloatingMascot";
 import {
   Trophy,
   Sparkles,
@@ -844,6 +845,11 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Floating Mascot — visible globally */}
+      <FloatingMascot
+      sizeClassName="w-32 md:w-48"
+      />
 
     </div>
   );
