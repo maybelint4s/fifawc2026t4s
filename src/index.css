@@ -1,20 +1,103 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
+:root {
+  --bg-dark: #0a0f24;
+  --bg-card: #131b3e;
+  --bg-card-hover: #1e2858;
+  --color-accent: #f3c623;
+  --color-gold: #d4af37;
+  
+  --text-white: #ffffff;
+  --text-slate-100: #f8fafc;
+  --text-slate-200: #e2e8f0;
+  --text-slate-300: #cbd5e1;
+  --text-slate-400: #94a3b8;
+  --text-slate-550: #64748b;
+  
+  --bg-slate-900: #0f172a;
+  --bg-slate-950: #020617;
+  --border-slate-800: #1e293b;
+  
+  --bg-header-from: #0d1637;
+  --bg-header-via: #152358;
+  --bg-header-to: #0a0f24;
+  
+  --bg-active-tab: #18234e;
+  --border-active-tab: #2b3a7a;
+  --bg-bracket-container: #111936;
+  --bg-time-preset-box: #1c2854;
+  --bg-toast: #12193e;
+  --border-toast: #1e1b4b;
+}
+
+:root.light {
+  --bg-dark: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --color-accent: #b45309;
+  --color-gold: #d97706;
+  
+  --text-white: #0f172a;
+  --text-slate-100: #0f172a;
+  --text-slate-200: #1e293b;
+  --text-slate-300: #334155;
+  --text-slate-400: #475569;
+  --text-slate-550: #64748b;
+  
+  --bg-slate-900: #e2e8f0;
+  --bg-slate-950: #cbd5e1;
+  --border-slate-800: #cbd5e1;
+  
+  --bg-header-from: #1e3a8a;
+  --bg-header-via: #2563eb;
+  --bg-header-to: #1d4ed8;
+  
+  --bg-active-tab: #eff6ff;
+  --border-active-tab: #93c5fd;
+  --bg-bracket-container: #e2e8f0;
+  --bg-time-preset-box: #dbeafe;
+  --bg-toast: #eff6ff;
+  --border-toast: #bfdbfe;
+}
+
 @theme {
   --font-sans: "Outfit", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --color-worldcup-dark: #0a0f24;
-  --color-worldcup-card: #131b3e;
-  --color-worldcup-card-hover: #1e2858;
-  --color-worldcup-accent: #f3c623;
-  --color-worldcup-gold: #d4af37;
+  
+  --color-slate-900: var(--bg-slate-900);
+  --color-slate-950: var(--bg-slate-950);
+  --color-slate-800: var(--border-slate-800);
+  --color-slate-100: var(--text-slate-100);
+  --color-slate-200: var(--text-slate-200);
+  --color-slate-300: var(--text-slate-300);
+  --color-slate-400: var(--text-slate-400);
+  --color-slate-500: var(--text-slate-550);
+  --color-white: var(--text-white);
+  
+  --color-worldcup-dark: var(--bg-dark);
+  --color-worldcup-card: var(--bg-card);
+  --color-worldcup-card-hover: var(--bg-card-hover);
+  --color-worldcup-accent: var(--color-accent);
+  --color-worldcup-gold: var(--color-gold);
+  
+  --color-worldcup-header-from: var(--bg-header-from);
+  --color-worldcup-header-via: var(--bg-header-via);
+  --color-worldcup-header-to: var(--bg-header-to);
+  
+  --color-worldcup-active-tab: var(--bg-active-tab);
+  --color-worldcup-active-tab-border: var(--border-active-tab);
+  --color-worldcup-bracket-container: var(--bg-bracket-container);
+  --color-worldcup-time-preset-box: var(--bg-time-preset-box);
+  --color-worldcup-toast: var(--bg-toast);
+  --color-worldcup-toast-border: var(--border-toast);
 }
 
 body {
   background-color: var(--color-worldcup-dark);
-  color: #f8fafc;
+  color: var(--color-slate-100);
   font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom scrollbar for beautiful columns layout */
@@ -24,14 +107,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0f24;
+  background: var(--bg-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e2858;
+  background: var(--bg-card-hover);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f3c623;
+  background: var(--color-accent);
 }
+

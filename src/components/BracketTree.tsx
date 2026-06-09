@@ -71,7 +71,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     return (
       <div
         key={match.id}
-        className={`relative group bg-[#111936] hover:bg-[#18234a] border ${
+        className={`relative group bg-worldcup-card hover:bg-worldcup-card-hover border ${
           hasResult
             ? "border-emerald-700/60 shadow- emerald-800/10"
             : locked
@@ -271,7 +271,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
         
         {/* Column 1: Octavos (8vos) */}
         <div className="flex flex-col gap-6 justify-around">
-          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-white border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-[#141b3a] py-1 rounded-t-lg">
+          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-white border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-slate-900 py-1 rounded-t-lg">
             <span>8vos de Final</span>
             <span className="text-[10px] bg-sky-500/20 text-sky-400 px-1.5 py-0.2 rounded">1/8</span>
           </div>
@@ -288,7 +288,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
 
         {/* Column 2: Cuartos de Final (CF) */}
         <div className="flex flex-col gap-6 justify-around">
-          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-white border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-[#141b3a] py-1 rounded-t-lg">
+          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-white border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-slate-900 py-1 rounded-t-lg">
             <span>Cuartos de Final</span>
             <span className="text-[10px] bg-violet-500/20 text-violet-400 px-1.5 py-0.2 rounded">1/4</span>
           </div>
@@ -307,7 +307,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
 
         {/* Column 3: Semifinales (SF) */}
         <div className="flex flex-col gap-6 justify-around">
-          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-white border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-[#141b3a] py-1 rounded-t-lg">
+          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-white border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-slate-900 py-1 rounded-t-lg">
             <span>Semifinales</span>
             <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.2 rounded">1/2</span>
           </div>
@@ -324,7 +324,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
 
         {/* Column 4: Final & Tercer Lugar (F) */}
         <div className="flex flex-col gap-6 justify-around">
-          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-worldcup-accent border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-[#1e1b4b] py-1 rounded-t-lg">
+          <div className="text-center font-mono text-sm tracking-wider font-extrabold text-worldcup-accent border-b border-slate-800 pb-1.5 uppercase flex items-center justify-center gap-1.5 bg-slate-900 py-1 rounded-t-lg">
             <span>🏆 Final</span>
             <span className="text-[10px] bg-yellow-500/20 text-worldcup-accent px-1.5 py-0.2 rounded">FIN</span>
           </div>

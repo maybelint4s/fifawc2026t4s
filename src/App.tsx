@@ -21,12 +21,31 @@ import {
   Check, 
   Info,
   CalendarDays,
-  Plus
+  Plus,
+  Sun,
+  Moon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
   // --------- STATE STORAGE & PERSISTENCE ---------
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem("fifa_theme");
+    return (saved === "light" || saved === "dark") ? saved : "dark";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("fifa_theme", theme);
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    } else {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    }
+  }, [theme]);
+
   const [employees, setEmployees] = useState<Employee[]>(() => {
     const saved = localStorage.getItem("fifa_employees_v1");
     return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
@@ -268,10 +287,10 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0f24] text-slate-100 flex flex-col font-sans transition-all duration-300">
+    <div className="min-h-screen bg-worldcup-dark text-slate-100 flex flex-col font-sans transition-all duration-300">
       
       {/* HEADER BANNER */}
-      <header id="app-header" className="relative bg-gradient-to-r from-[#0d1637] via-[#152358] to-[#0a0f24] border-b border-indigo-950/85 shadow-2xl py-6 px-4 md:px-8">
+      <header id="app-header" className="relative bg-gradient-to-r from-worldcup-header-from via-worldcup-header-via to-worldcup-header-to border-b border-worldcup-toast-border/85 shadow-2xl py-6 px-4 md:px-8">
         {/* Glow ball backdrop */}
         <div className="absolute top-1/2 left-20 -translate-y-1/2 w-44 h-44 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-20 -translate-y-1/2 w-44 h-44 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -296,13 +315,23 @@ export default function App() {
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-0.5 mt-1 flex items-center gap-2">
                 Copa Mundial de la FIFA 2026
               </h1>
-              <p className="text-xs text-slate-350 max-w-xl">
+              <p className="text-xs text-slate-300 max-w-xl">
                 Pronósticos de la copa mundial de fútbol, tabla general de clasificación y árbol interactivo conectados para fomentar la cultura corporativa.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="px-3.5 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-900/60 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              title={theme === "dark" ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
+            >
+              {theme === "dark" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
+              {theme === "dark" ? "Modo Claro" : "Modo Oscuro"}
+            </button>
+
             {/* Reset simulator state */}
             <button
               onClick={handleResetSimulation}
@@ -324,7 +353,7 @@ export default function App() {
 
       {/* TOAST NOTIFICATION WINDOW */}
       {bannerMsg && (
-        <div className="bg-[#12193e] border-y border-indigo-950 px-4 py-2.5 text-center transition-all">
+        <div className="bg-worldcup-toast border-y border-worldcup-toast-border px-4 py-2.5 text-center transition-all">
           <div className="max-w-7xl mx-auto flex items-center justify-center gap-2.5 text-xs md:text-sm font-sans">
             {bannerMsg.type === "success" && <span className="text-emerald-400">✔️</span>}
             {bannerMsg.type === "info" && <span className="text-worldcup-accent">✨</span>}
@@ -354,7 +383,7 @@ export default function App() {
               onClick={() => setActiveTab("ARBOL")}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === "ARBOL"
-                  ? "bg-[#18234e] text-worldcup-accent border border-[#2b3a7a] shadow-lg"
+                  ? "bg-worldcup-active-tab text-worldcup-accent border border-worldcup-active-tab-border shadow-lg"
                   : "text-slate-400 hover:text-white hover:bg-slate-900/60"
               }`}
             >
@@ -366,7 +395,7 @@ export default function App() {
               onClick={() => setActiveTab("LISTA")}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === "LISTA"
-                  ? "bg-[#18234e] text-worldcup-accent border border-[#2b3a7a] shadow-lg"
+                  ? "bg-worldcup-active-tab text-worldcup-accent border border-worldcup-active-tab-border shadow-lg"
                   : "text-slate-400 hover:text-white hover:bg-slate-900/60"
               }`}
             >
@@ -377,7 +406,7 @@ export default function App() {
 
           {/* RENDERING OPTION A: BRACKET TREE */}
           {activeTab === "ARBOL" && (
-            <div className="bg-[#111936]/40 border border-slate-800/80 rounded-3xl p-4 md:p-6 shadow-2xl relative overflow-hidden">
+            <div className="bg-worldcup-bracket-container/40 border border-slate-800/80 rounded-3xl p-4 md:p-6 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-2 bg-indigo-900/10 text-indigo-400 text-[10px] font-mono border-l border-b border-indigo-950 rounded-bl-xl uppercase font-bold">
                 Knockout Tree
               </div>
@@ -551,9 +580,9 @@ export default function App() {
                         </div>
 
                         {/* Prediction state / interactive form */}
-                        <div className="bg-slate-950/90 rounded-xl p-3 border border-slate-900/60 text-xs text-slate-300">
+                        <div className="bg-slate-950/90 rounded-xl p-3 border border-slate-900/60 text-xs text-slate-350">
                           <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/5">
-                            <span className="text-[10px] uppercase font-bold tracking-widest text-[#94a3b8]">
+                            <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">
                               Tú Predicción
                             </span>
                             {pred && finished && (
@@ -609,7 +638,7 @@ export default function App() {
 
                               {/* Coworkers list block */}
                               <div className="pt-2 border-t border-slate-900/60">
-                                <span className="text-[9px] text-[#64748b] uppercase tracking-wider block mb-1">
+                                <span className="text-[9px] text-slate-500 uppercase tracking-wider block mb-1">
                                   Predicciones de tus compañeros de oficina ({allPredsCount}):
                                 </span>
                                 <div className="space-y-1">
