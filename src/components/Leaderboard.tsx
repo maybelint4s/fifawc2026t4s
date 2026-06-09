@@ -95,7 +95,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       </p>
 
       {/* Leaderboard list */}
-      <div id="leaderboard-list" className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+      <div id="leaderboard-list" className="space-y-1.5 sm:space-y-2 max-h-[420px] overflow-y-auto pr-1">
         {sortedLeaderboard.map((item, index) => {
           const isActive = item.employeeId === activeEmployeeId;
           const isTop3 = index < 3;
@@ -105,13 +105,13 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
               key={item.employeeId}
               id={`leaderboard-item-${item.employeeId}`}
               onClick={() => onSelectEmployee(item.employeeId)}
-              className={`p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-between border ${
+              className={`p-2.5 sm:p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-between border gap-2 ${
                 isActive
                   ? "bg-slate-900/90 border-worldcup-accent ring-2 ring-worldcup-accent/30 shadow-md transform scale-[1.01]"
                   : "bg-slate-900/40 hover:bg-slate-900/80 border-slate-800/80"
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 {/* Position Badge */}
                 <div className="w-6 text-center">
                   {index === 0 && <Medal className="w-5 h-5 text-yellow-500 mx-auto" />}
@@ -121,11 +121,11 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
 
                 {/* Avatar */}
-                <span className="text-2xl select-none">{item.avatar}</span>
+                <span className="text-xl sm:text-2xl select-none shrink-0">{item.avatar}</span>
 
-                <div>
-                  <div className="font-semibold text-sm text-white flex items-center gap-1.5">
-                    {item.name}
+                <div className="min-w-0">
+                  <div className="font-semibold text-xs sm:text-sm text-white flex items-center gap-1 sm:gap-1.5">
+                    <span className="truncate">{item.name}</span>
                     {isActive && (
                       <span className="text-[10px] bg-worldcup-accent/20 text-worldcup-accent border border-worldcup-accent/30 px-1.5 py-0.2 rounded font-sans uppercase tracking-widest font-bold">
                         Tú
@@ -136,7 +136,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 {/* Exact Score & Winner Hits stats */}
                 <div className="text-right flex flex-col items-end">
                   <div className="text-xs text-slate-400 flex items-center gap-2">
@@ -150,7 +150,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
 
                 {/* Points */}
-                <div className="bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 min-w-[50px] text-center">
+                <div className="bg-slate-950 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-800 min-w-[40px] sm:min-w-[50px] text-center">
                   <span className="block text-xs text-slate-500 font-mono font-bold leading-none uppercase">Pts</span>
                   <span className="text-sm font-black text-worldcup-accent font-mono leading-none">{item.totalPoints}</span>
                 </div>

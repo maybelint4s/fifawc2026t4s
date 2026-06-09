@@ -401,14 +401,14 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   return (
     <div className="flex flex-col gap-4 select-none">
       {/* Navigation Buttons */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 bracket-nav-scroll">
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 bracket-nav-scroll">
         {ROUNDS.map((r) => {
           const isActive = activeRound === r.key;
           return (
             <button
               key={r.key}
               onClick={() => scrollToRound(r.key)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all duration-300 ${
+              className={`flex-shrink-0 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider border transition-all duration-300 ${
                 isActive
                   ? `${r.bg} ${r.color} ${r.border} shadow-lg scale-105`
                   : "bg-slate-900/50 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white"
@@ -429,7 +429,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
       >
-        <div className="flex items-stretch px-4 py-6 gap-2 min-h-[620px]">
+        <div className="flex items-stretch px-2 sm:px-4 py-4 sm:py-6 gap-2 min-h-[500px] sm:min-h-[620px]">
           {/* ==================== FG Column ==================== */}
           <motion.div
             ref={(el) => {
@@ -437,12 +437,12 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             }}
             animate={getColumnAnimation("FG")}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[300px] flex flex-col gap-3 shrink-0"
+            className="bracket-round-column w-[220px] sm:w-[280px] md:w-[300px] flex flex-col gap-2 sm:gap-3 shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-sm">
               <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Fase de Grupos</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 content-start">
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 content-start">
               {["Grupo A", "Grupo B", "Grupo C", "Grupo D", "Grupo E", "Grupo F", "Grupo G", "Grupo H"].map((g) => (
                 <div key={g}>
                   <GroupMiniCard groupName={g} />
@@ -458,7 +458,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             }}
             animate={getColumnAnimation("8vos")}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[260px] flex flex-col shrink-0"
+            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-sky-500/20 bg-sky-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-sky-400">Octavos de Final</span>
@@ -488,7 +488,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             }}
             animate={getColumnAnimation("CF")}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[260px] flex flex-col shrink-0"
+            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-violet-500/20 bg-violet-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-violet-400">Cuartos de Final</span>
@@ -518,7 +518,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             }}
             animate={getColumnAnimation("SF")}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[260px] flex flex-col shrink-0"
+            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-purple-500/20 bg-purple-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-purple-400">Semifinales</span>
@@ -548,7 +548,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             }}
             animate={getColumnAnimation("F")}
             transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[280px] flex flex-col shrink-0 pr-4"
+            className="bracket-round-column w-[220px] sm:w-[260px] md:w-[280px] flex flex-col shrink-0 pr-2 sm:pr-4"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-yellow-500/20 bg-yellow-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-yellow-400">🏆 Finales</span>
