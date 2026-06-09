@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --color-worldcup-dark: #0a0f24;
+  --color-worldcup-card: #131b3e;
+  --color-worldcup-card-hover: #1e2858;
+  --color-worldcup-accent: #f3c623;
+  --color-worldcup-gold: #d4af37;
+}
+
+body {
+  background-color: var(--color-worldcup-dark);
+  color: #f8fafc;
+  font-family: var(--font-sans);
+}
+
+/* Custom scrollbar for beautiful columns layout */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0f24;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e2858;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f3c623;
+}
