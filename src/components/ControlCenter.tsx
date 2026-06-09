@@ -58,7 +58,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
       {/* Active User Switcher section */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-[#94a3b8] flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
             <UserCheck className="w-4 h-4 text-worldcup-accent" />
             Usuario Activo Actual
           </h3>
@@ -100,7 +100,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
                   className={`px-2 py-1.5 rounded-lg text-xs font-medium text-left truncate flex items-center gap-1.5 border transition-all ${
                     isSelected
                       ? "bg-slate-900 border-worldcup-accent text-white"
-                      : "bg-[#111936]/40 hover:bg-slate-900/60 border-slate-800/80 text-slate-300"
+                      : "bg-worldcup-bracket-container/40 hover:bg-slate-900/60 border-slate-800/80 text-slate-300"
                   }`}
                 >
                   <span className="text-sm shrink-0">{emp.avatar}</span>
@@ -170,7 +170,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
 
       {/* Clock / Virtual Simulated Time Section */}
       <div>
-        <h3 className="text-sm font-bold uppercase tracking-widest text-[#94a3b8] flex items-center gap-1.5 mb-2">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1.5 mb-2">
           <Clock className="w-4 h-4 text-worldcup-accent" />
           Simulador de Reloj Corporativo
         </h3>
@@ -179,7 +179,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
         </p>
 
         {/* Selected date display */}
-        <div className="bg-[#1c2854]/40 border border-indigo-900/60 p-3 rounded-xl flex flex-col gap-1.5 mb-3">
+        <div className="bg-worldcup-time-preset-box/40 border border-slate-800 p-3 rounded-xl flex flex-col gap-1.5 mb-3">
           <div className="text-[10px] font-mono text-indigo-300 font-bold uppercase flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5 text-worldcup-accent" />
             Fecha Virtual Actual del App:
@@ -204,7 +204,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
                   className={`w-full py-1.5 px-3 rounded-lg text-xs font-mono font-medium text-left flex items-center justify-between border transition-all ${
                     isActive
                       ? "bg-slate-950 border-worldcup-accent text-worldcup-accent"
-                      : "bg-[#111936]/40 hover:bg-[#18234a] border-slate-800/80 text-slate-300"
+                      : "bg-worldcup-bracket-container/40 hover:bg-worldcup-active-tab border-slate-800/80 text-slate-300"
                   }`}
                 >
                   <span>{preset.label}</span>

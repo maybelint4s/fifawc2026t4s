@@ -5,28 +5,47 @@ import { Leaderboard } from "./components/Leaderboard";
 import { ControlCenter } from "./components/ControlCenter";
 import { GroupTables } from "./components/GroupTables";
 import { BracketTree } from "./components/BracketTree";
-import { 
-  Trophy, 
-  Sparkles, 
-  Calendar, 
-  Users, 
-  HelpCircle, 
-  TrendingUp, 
-  Lock, 
-  Unlock, 
-  Undo, 
-  Eye, 
-  BadgeAlert, 
-  Settings, 
-  Check, 
+import {
+  Trophy,
+  Sparkles,
+  Calendar,
+  Users,
+  HelpCircle,
+  TrendingUp,
+  Lock,
+  Unlock,
+  Undo,
+  Eye,
+  BadgeAlert,
+  Settings,
+  Check,
   Info,
   CalendarDays,
-  Plus
+  Plus,
+  Sun,
+  Moon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
   // --------- STATE STORAGE & PERSISTENCE ---------
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const saved = localStorage.getItem("fifa_theme");
+    return (saved === "light" || saved === "dark") ? saved : "dark";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("fifa_theme", theme);
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    } else {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    }
+  }, [theme]);
+
   const [employees, setEmployees] = useState<Employee[]>(() => {
     const saved = localStorage.getItem("fifa_employees_v1");
     return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
@@ -54,7 +73,7 @@ export default function App() {
 
   // Active UI Tabs: "ARBOL" (Interactive bracket tree) or "LISTA" (Fixtures list & group tables)
   const [activeTab, setActiveTab] = useState<"ARBOL" | "LISTA">("ARBOL");
-  
+
   // Highlighting specific stage filter under LISTA mode: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"
   const [stageFilter, setStageFilter] = useState<"FG" | "8vos" | "CF" | "SF" | "F">("FG");
 
@@ -268,10 +287,10 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0f24] text-slate-100 flex flex-col font-sans transition-all duration-300">
-      
+    <div className="min-h-screen bg-worldcup-dark text-slate-100 flex flex-col font-sans transition-all duration-300">
+
       {/* HEADER BANNER */}
-      <header id="app-header" className="relative bg-gradient-to-r from-[#0d1637] via-[#152358] to-[#0a0f24] border-b border-indigo-950/85 shadow-2xl py-6 px-4 md:px-8">
+      <header id="app-header" className="relative bg-gradient-to-r from-worldcup-header-from via-worldcup-header-via to-worldcup-header-to border-b border-worldcup-toast-border/85 shadow-2xl py-6 px-4 md:px-8">
         {/* Glow ball backdrop */}
         <div className="absolute top-1/2 left-20 -translate-y-1/2 w-44 h-44 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-20 -translate-y-1/2 w-44 h-44 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -279,11 +298,14 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
           <div className="flex items-center gap-3.5">
             {/* World Cup Trophy styled logo */}
-            <div className="w-14 h-14 bg-slate-900 border-2 border-worldcup-accent rounded-2xl flex items-center justify-center p-1.5 shadow-lg relative group">
-              <span className="text-3xl select-none">🏆</span>
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-yellow-400 rounded-full animate-ping pointer-events-none" />
+            <div className="w-14 h-14 flex items-center justify-center relative group overflow-hidden">
+              <img
+                src="/resources/wct4sicon.ico"
+                alt="FIFA World Cup 2026"
+                className="w-full h-full object-contain select-none"
+              />
             </div>
-            
+
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] bg-worldcup-accent/25 text-worldcup-accent border border-worldcup-accent/30 font-mono font-black uppercase px-2 py-0.5 rounded tracking-widest">
@@ -296,13 +318,23 @@ export default function App() {
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-0.5 mt-1 flex items-center gap-2">
                 Copa Mundial de la FIFA 2026
               </h1>
-              <p className="text-xs text-slate-350 max-w-xl">
+              <p className="text-xs text-slate-300 max-w-xl">
                 Pronósticos de la copa mundial de fútbol, tabla general de clasificación y árbol interactivo conectados para fomentar la cultura corporativa.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="px-3.5 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-900/60 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              title={theme === "dark" ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
+            >
+              {theme === "dark" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
+              {theme === "dark" ? "Modo Claro" : "Modo Oscuro"}
+            </button>
+
             {/* Reset simulator state */}
             <button
               onClick={handleResetSimulation}
@@ -324,7 +356,7 @@ export default function App() {
 
       {/* TOAST NOTIFICATION WINDOW */}
       {bannerMsg && (
-        <div className="bg-[#12193e] border-y border-indigo-950 px-4 py-2.5 text-center transition-all">
+        <div className="bg-worldcup-toast border-y border-worldcup-toast-border px-4 py-2.5 text-center transition-all">
           <div className="max-w-7xl mx-auto flex items-center justify-center gap-2.5 text-xs md:text-sm font-sans">
             {bannerMsg.type === "success" && <span className="text-emerald-400">✔️</span>}
             {bannerMsg.type === "info" && <span className="text-worldcup-accent">✨</span>}
@@ -332,8 +364,8 @@ export default function App() {
             <span className="text-slate-200">
               {bannerMsg.text}
             </span>
-            <button 
-              onClick={() => setBannerMsg(null)} 
+            <button
+              onClick={() => setBannerMsg(null)}
               className="text-slate-500 hover:text-white px-2 hover:bg-slate-900 rounded font-mono text-xs font-bold transition-all ml-2"
             >
               x
@@ -344,19 +376,18 @@ export default function App() {
 
       {/* MAIN CONTAINER */}
       <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6">
-        
+
         {/* LEFT COMPONENT COLUMN (Tabs, Brackets, Group stages) */}
         <div className="flex-1 space-y-6">
-          
+
           {/* TABS SELECTOR FOR BRACKET vs LIST/GROUPS */}
           <div className="flex flex-col sm:flex-row p-1 bg-slate-950/90 rounded-2xl border border-slate-800 gap-1">
             <button
               onClick={() => setActiveTab("ARBOL")}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-1.5 ${
-                activeTab === "ARBOL"
-                  ? "bg-[#18234e] text-worldcup-accent border border-[#2b3a7a] shadow-lg"
-                  : "text-slate-400 hover:text-white hover:bg-slate-900/60"
-              }`}
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-1.5 ${activeTab === "ARBOL"
+                ? "bg-worldcup-active-tab text-worldcup-accent border border-worldcup-active-tab-border shadow-lg"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+                }`}
             >
               <TrendingUp className="w-4 h-4" />
               Árbol de Partidos Interactivo (Eliminatorias)
@@ -364,11 +395,10 @@ export default function App() {
 
             <button
               onClick={() => setActiveTab("LISTA")}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-1.5 ${
-                activeTab === "LISTA"
-                  ? "bg-[#18234e] text-worldcup-accent border border-[#2b3a7a] shadow-lg"
-                  : "text-slate-400 hover:text-white hover:bg-slate-900/60"
-              }`}
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-1.5 ${activeTab === "LISTA"
+                ? "bg-worldcup-active-tab text-worldcup-accent border border-worldcup-active-tab-border shadow-lg"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+                }`}
             >
               <CalendarDays className="w-4 h-4" />
               Fase de Grupos & Listado de Fechas
@@ -377,11 +407,11 @@ export default function App() {
 
           {/* RENDERING OPTION A: BRACKET TREE */}
           {activeTab === "ARBOL" && (
-            <div className="bg-[#111936]/40 border border-slate-800/80 rounded-3xl p-4 md:p-6 shadow-2xl relative overflow-hidden">
+            <div className="bg-worldcup-bracket-container/40 border border-slate-800/80 rounded-3xl p-4 md:p-6 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-2 bg-indigo-900/10 text-indigo-400 text-[10px] font-mono border-l border-b border-indigo-950 rounded-bl-xl uppercase font-bold">
                 Knockout Tree
               </div>
-              
+
               <div className="mb-5">
                 <h2 className="text-xl font-black text-white flex items-center gap-1.5">
                   Fase Avanzada & Eliminatorias Directas
@@ -416,11 +446,10 @@ export default function App() {
                     <button
                       key={stage}
                       onClick={() => setStageFilter(stage)}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all uppercase ${
-                        isActive
-                          ? "bg-worldcup-accent text-slate-900 shadow"
-                          : "bg-slate-900/50 text-slate-405 hover:bg-slate-900/90 text-slate-200"
-                      }`}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all uppercase ${isActive
+                        ? "bg-worldcup-accent text-slate-900 shadow"
+                        : "bg-slate-900/50 text-slate-405 hover:bg-slate-900/90 text-slate-200"
+                        }`}
                     >
                       {stage === "FG" ? "Fase de Grupos" : stage}
                     </button>
@@ -466,7 +495,7 @@ export default function App() {
                   {filteredMatchesForList.map((match) => {
                     const locked = isMatchLocked(match);
                     const finished = match.status === "Finished";
-                    
+
                     // Predict values
                     const pred = predictions.find(
                       (p) => p.matchId === match.id && p.employeeId === activeEmployeeId
@@ -479,13 +508,12 @@ export default function App() {
                       <div
                         key={match.id}
                         id={`fixture-card-${match.id}`}
-                        className={`bg-worldcup-card hover:bg-worldcup-card-hover border p-4 rounded-2xl transition-all flex flex-col justify-between ${
-                          finished
-                            ? "border-emerald-700/60 shadow-lg shadow-emerald-950/20"
-                            : locked
+                        className={`bg-worldcup-card hover:bg-worldcup-card-hover border p-4 rounded-2xl transition-all flex flex-col justify-between ${finished
+                          ? "border-emerald-700/60 shadow-lg shadow-emerald-950/20"
+                          : locked
                             ? "border-amber-700/50 shadow"
                             : "border-slate-800 hover:border-slate-700"
-                        }`}
+                          }`}
                       >
                         <div>
                           {/* Card top details */}
@@ -551,9 +579,9 @@ export default function App() {
                         </div>
 
                         {/* Prediction state / interactive form */}
-                        <div className="bg-slate-950/90 rounded-xl p-3 border border-slate-900/60 text-xs text-slate-300">
+                        <div className="bg-slate-950/90 rounded-xl p-3 border border-slate-900/60 text-xs text-slate-350">
                           <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/5">
-                            <span className="text-[10px] uppercase font-bold tracking-widest text-[#94a3b8]">
+                            <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">
                               Tú Predicción
                             </span>
                             {pred && finished && (
@@ -609,7 +637,7 @@ export default function App() {
 
                               {/* Coworkers list block */}
                               <div className="pt-2 border-t border-slate-900/60">
-                                <span className="text-[9px] text-[#64748b] uppercase tracking-wider block mb-1">
+                                <span className="text-[9px] text-slate-500 uppercase tracking-wider block mb-1">
                                   Predicciones de tus compañeros de oficina ({allPredsCount}):
                                 </span>
                                 <div className="space-y-1">
@@ -661,7 +689,7 @@ export default function App() {
 
         {/* RIGHT COLUMN (Control Center, Leaderboard standings) */}
         <div className="w-full lg:w-[350px] shrink-0 space-y-6">
-          
+
           {/* Active Employee selector & system simulated time configs */}
           <ControlCenter
             employees={employees}
@@ -759,22 +787,20 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setAdminTieWinner("teamA")}
-                        className={`py-1 px-2 rounded text-xs truncate transition-all ${
-                          adminTieWinner === "teamA"
-                            ? "bg-worldcup-accent text-slate-950 font-bold"
-                            : "bg-slate-900 text-slate-300 hover:bg-slate-800"
-                        }`}
+                        className={`py-1 px-2 rounded text-xs truncate transition-all ${adminTieWinner === "teamA"
+                          ? "bg-worldcup-accent text-slate-950 font-bold"
+                          : "bg-slate-900 text-slate-300 hover:bg-slate-800"
+                          }`}
                       >
                         {selectedSimulateMatch.teamA.name}
                       </button>
                       <button
                         type="button"
                         onClick={() => setAdminTieWinner("teamB")}
-                        className={`py-1 px-2 rounded text-xs truncate transition-all ${
-                          adminTieWinner === "teamB"
-                            ? "bg-worldcup-accent text-slate-950 font-bold"
-                            : "bg-slate-900 text-slate-300 hover:bg-slate-800"
-                        }`}
+                        className={`py-1 px-2 rounded text-xs truncate transition-all ${adminTieWinner === "teamB"
+                          ? "bg-worldcup-accent text-slate-950 font-bold"
+                          : "bg-slate-900 text-slate-300 hover:bg-slate-800"
+                          }`}
                       >
                         {selectedSimulateMatch.teamB.name}
                       </button>

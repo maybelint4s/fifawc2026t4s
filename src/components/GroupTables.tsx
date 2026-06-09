@@ -73,7 +73,7 @@ export const GroupTables: React.FC<GroupTablesProps> = ({ teams, matches }) => {
         <div
           key={groupName}
           id={`table-${groupName.replace(/\s+/g, "-")}`}
-          className="bg-[#111936]/80 p-4 rounded-xl border border-slate-800/80"
+          className="bg-worldcup-bracket-container/80 p-4 rounded-xl border border-slate-800/80"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
