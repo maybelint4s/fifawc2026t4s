@@ -57,6 +57,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeRound, setActiveRound] = useState<string>("FG");
+  const [focusMode, setFocusMode] = useState(false);
   const dragStart = useRef({ x: 0, scrollLeft: 0 });
   const columnRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const hasAnimated = useRef(false);
@@ -105,6 +106,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   const scrollToRound = useCallback(
     (roundKey: string) => {
       setActiveRound(roundKey);
+      setFocusMode(true);
       const col = columnRefs.current.get(roundKey);
       const container = scrollRef.current;
       if (!col || !container) return;
@@ -124,6 +126,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     if (!isDragging) return;
     const dx = e.clientX - dragStart.current.x;
     if (Math.abs(dx) > 5) isDrag.current = true;
+    if (isDrag.current) setFocusMode(false);
     if (scrollRef.current) {
       scrollRef.current.scrollLeft = dragStart.current.scrollLeft - dx * 1.2;
     }
@@ -146,7 +149,6 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
       }
     });
     setActiveRound(closest);
-    scrollToRound(closest);
   };
 
   // Anime.js entrance animation (connectors + group cards)
@@ -180,6 +182,23 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     F: matches.filter((m) => m.stage === "F"),
   };
 
+  const getColumnAnimation = (roundKey: string) => {
+    if (!focusMode) {
+      return { scale: 1, opacity: 1, filter: "blur(0px)" };
+    }
+    const activeIndex = ROUNDS.findIndex((r) => r.key === activeRound);
+    const colIndex = ROUNDS.findIndex((r) => r.key === roundKey);
+    const dist = Math.abs(activeIndex - colIndex);
+
+    if (dist === 0) {
+      return { scale: 1, opacity: 1, filter: "blur(0px)" };
+    }
+    if (dist === 1) {
+      return { scale: 0.9, opacity: 0.25, filter: "blur(4px)" };
+    }
+    return { scale: 0.8, opacity: 0, filter: "blur(8px)" };
+  };
+
   const MatchCard = ({ match, index }: { match: Match; index: number }) => {
     const locked = isMatchLocked(match);
     const hasResult = match.status === "Finished" || match.status === "Live";
@@ -188,7 +207,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
 
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.88, x: 30 }}
+        initial={{ opacity: 0, scale: 0.85, x: 40 }}
         whileInView={{ opacity: 1, scale: 1, x: 0 }}
         viewport={{ once: true, amount: 0.35 }}
         transition={{ duration: 0.5, delay: index * 0.04, ease: [0.32, 0.72, 0, 1] }}
@@ -343,7 +362,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     const standings = getGroupStandings(groupName);
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.92, x: -20 }}
+        initial={{ opacity: 0, scale: 0.92, x: -30 }}
         whileInView={{ opacity: 1, scale: 1, x: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
@@ -412,10 +431,12 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
       >
         <div className="flex items-stretch px-4 py-6 gap-2 min-h-[620px]">
           {/* ==================== FG Column ==================== */}
-          <div
+          <motion.div
             ref={(el) => {
               if (el) columnRefs.current.set("FG", el);
             }}
+            animate={getColumnAnimation("FG")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="bracket-round-column w-[300px] flex flex-col gap-3 shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-sm">
@@ -428,13 +449,15 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* ==================== Octavos ==================== */}
-          <div
+          <motion.div
             ref={(el) => {
               if (el) columnRefs.current.set("8vos", el);
             }}
+            animate={getColumnAnimation("8vos")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="bracket-round-column w-[260px] flex flex-col shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-sky-500/20 bg-sky-500/10 backdrop-blur-sm mb-2">
@@ -447,18 +470,24 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Connector 8vos → CF */}
-          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
+          <motion.div
+            animate={getColumnAnimation("8vos")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="bracket-connector shrink-0 hidden md:flex flex-col"
+          >
             <KnockoutConnector count={4} />
-          </div>
+          </motion.div>
 
           {/* ==================== Cuartos ==================== */}
-          <div
+          <motion.div
             ref={(el) => {
               if (el) columnRefs.current.set("CF", el);
             }}
+            animate={getColumnAnimation("CF")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="bracket-round-column w-[260px] flex flex-col shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-violet-500/20 bg-violet-500/10 backdrop-blur-sm mb-2">
@@ -471,18 +500,24 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Connector CF → SF */}
-          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
+          <motion.div
+            animate={getColumnAnimation("CF")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="bracket-connector shrink-0 hidden md:flex flex-col"
+          >
             <KnockoutConnector count={2} />
-          </div>
+          </motion.div>
 
           {/* ==================== Semis ==================== */}
-          <div
+          <motion.div
             ref={(el) => {
               if (el) columnRefs.current.set("SF", el);
             }}
+            animate={getColumnAnimation("SF")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="bracket-round-column w-[260px] flex flex-col shrink-0"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-purple-500/20 bg-purple-500/10 backdrop-blur-sm mb-2">
@@ -495,18 +530,24 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Connector SF → F */}
-          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
+          <motion.div
+            animate={getColumnAnimation("SF")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="bracket-connector shrink-0 hidden md:flex flex-col"
+          >
             <KnockoutConnector count={1} />
-          </div>
+          </motion.div>
 
           {/* ==================== Final ==================== */}
-          <div
+          <motion.div
             ref={(el) => {
               if (el) columnRefs.current.set("F", el);
             }}
+            animate={getColumnAnimation("F")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             className="bracket-round-column w-[280px] flex flex-col shrink-0 pr-4"
           >
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-yellow-500/20 bg-yellow-500/10 backdrop-blur-sm mb-2">
@@ -524,7 +565,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
