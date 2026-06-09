@@ -56,7 +56,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"ARBOL" | "LISTA">("ARBOL");
   
   // Highlighting specific stage filter under LISTA mode: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"
-  const [stageFilter, setStageFilter] = useState<"FG" | "16vos" | "8vos" | "CF" | "SF" | "F">("FG");
+  const [stageFilter, setStageFilter] = useState<"FG" | "8vos" | "CF" | "SF" | "F">("FG");
 
   // State for administrative results modal
   const [selectedSimulateMatch, setSelectedSimulateMatch] = useState<Match | null>(null);
@@ -410,7 +410,7 @@ export default function App() {
 
               {/* Sub Stage Selector BAR */}
               <div id="substage-select-bar" className="flex flex-wrap gap-1.5 justify-start bg-slate-950/60 p-2 border border-slate-800 rounded-2xl">
-                {(["FG", "16vos", "8vos", "CF", "SF", "F"] as const).map((stage) => {
+                {(["FG", "8vos", "CF", "SF", "F"] as const).map((stage) => {
                   const isActive = stageFilter === stage;
                   return (
                     <button

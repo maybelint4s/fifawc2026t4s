@@ -35,3 +35,31 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #f3c623;
 }
+
+/* Bracket Tree Horizontal Scroll */
+.bracket-scroll-container {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.bracket-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+.bracket-scroll-container:active {
+  cursor: grabbing;
+}
+.bracket-round-column {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+.bracket-nav-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.bracket-nav-scroll::-webkit-scrollbar {
+  display: none;
+}

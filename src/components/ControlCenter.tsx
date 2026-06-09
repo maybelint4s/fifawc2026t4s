@@ -28,7 +28,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
   const presets = [
     { label: "Junio 11 (Inicio)", value: "2026-06-11T12:00:00", desc: "Todo abierto" },
     { label: "Junio 17 (Grupos)", value: "2026-06-17T18:00:00", desc: "Grupos en juego" },
-    { label: "Junio 29 (16vos)", value: "2026-06-29T20:00:00", desc: "Ronda de 16vos" },
+    { label: "Junio 29 (Octavos)", value: "2026-06-29T20:00:00", desc: "Octavos de final" },
     { label: "Julio 4 (Octavos)", value: "2026-07-04T15:00:00", desc: "Octavos en juego" },
     { label: "Julio 19 (Finales)", value: "2026-07-19T18:00:00", desc: "Gran Final finalizada" },
   ];
