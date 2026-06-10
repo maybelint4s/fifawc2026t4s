@@ -99,17 +99,16 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         {sortedLeaderboard.map((item, index) => {
           const isActive = item.employeeId === activeEmployeeId;
           const isTop3 = index < 3;
-          
+
           return (
             <div
               key={item.employeeId}
               id={`leaderboard-item-${item.employeeId}`}
               onClick={() => onSelectEmployee(item.employeeId)}
-              className={`p-2.5 sm:p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-between border gap-2 ${
-                isActive
+              className={`p-2.5 sm:p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-between border gap-2 ${isActive
                   ? "bg-slate-900/90 border-worldcup-accent ring-2 ring-worldcup-accent/30 shadow-md transform scale-[1.01]"
                   : "bg-slate-900/40 hover:bg-slate-900/80 border-slate-800/80"
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 {/* Position Badge */}
@@ -126,11 +125,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                 <div className="min-w-0">
                   <div className="font-semibold text-xs sm:text-sm text-white flex items-center gap-1 sm:gap-1.5">
                     <span className="truncate">{item.name}</span>
-                    {isActive && (
-                      <span className="text-[10px] bg-worldcup-accent/20 text-worldcup-accent border border-worldcup-accent/30 px-1.5 py-0.2 rounded font-sans uppercase tracking-widest font-bold">
-                        Tú
-                      </span>
-                    )}
+                    {isActive}
                   </div>
                   <div className="text-xs text-slate-400 font-sans">{item.role}</div>
                 </div>

@@ -16,7 +16,7 @@ export interface MatchParticipant {
 
 export interface Match {
   id: string;
-  stage: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F";
+  stage: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"; // updated to support World Cup 2026 format (48 teams = 16vos added)
   groupName?: string; // e.g. "Grupo A", only for group stage
   teamA: MatchParticipant;
   teamB: MatchParticipant;
@@ -25,7 +25,8 @@ export interface Match {
   status: "Pending" | "Live" | "Finished";
   date: string; // e.g., "Sáb, jul 4"
   time: string; // e.g., "5:00 p.m."
-  datetimeISO: string; // e.g. "2026-07-04T17:00:00" - used with simulated corporate time
+  datetimeISO: string; // e.g. "2026-07-04T17:00:00" - used for real-time locking
+  venue?: string; // e.g., "Estadio Azteca, CDMX"
   nextMatchId?: string; // id of match that advances
   nextMatchPosition?: "teamA" | "teamB"; // position in next match (teamA or teamB)
 }

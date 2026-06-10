@@ -38,7 +38,7 @@ export default function App() {
   // --------- STATE STORAGE & PERSISTENCE ---------
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     const saved = localStorage.getItem("fifa_theme");
-    return (saved === "light" || saved === "dark") ? saved : "dark";
+    return (saved === "light" || saved === "dark") ? saved : "light";
   });
 
   useEffect(() => {
@@ -54,35 +54,32 @@ export default function App() {
   }, [theme]);
 
   const [employees, setEmployees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem("fifa_employees_v1");
+    const saved = localStorage.getItem("fifa_employees_v2");
     return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
   });
 
   const [matches, setMatches] = useState<Match[]>(() => {
-    const saved = localStorage.getItem("fifa_matches_v1");
+    const saved = localStorage.getItem("fifa_matches_v2");
     return saved ? JSON.parse(saved) : INITIAL_MATCHES;
   });
 
   const [predictions, setPredictions] = useState<Prediction[]>(() => {
-    const saved = localStorage.getItem("fifa_predictions_v1");
+    const saved = localStorage.getItem("fifa_predictions_v2");
     return saved ? JSON.parse(saved) : PRELOADED_PREDICTIONS;
   });
 
   const [activeEmployeeId, setActiveEmployeeId] = useState<string>(() => {
-    const saved = localStorage.getItem("fifa_active_emp_v1");
+    const saved = localStorage.getItem("fifa_active_emp_v2");
     return saved || "emp1";
   });
 
-  const [simulatedTime, setSimulatedTime] = useState<string>(() => {
-    const saved = localStorage.getItem("fifa_simulated_time_v1");
-    return saved || "2026-06-11T12:00:00"; // Begins day of Opener
-  });
+  // Real-time locking: uses actual system time (new Date()) instead of simulated time
 
   // Active UI Tabs: "ARBOL" (Interactive bracket tree) or "LISTA" (Fixtures list & group tables)
   const [activeTab, setActiveTab] = useState<"ARBOL" | "LISTA">("ARBOL");
 
   // Highlighting specific stage filter under LISTA mode: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"
-  const [stageFilter, setStageFilter] = useState<"FG" | "8vos" | "CF" | "SF" | "F">("FG");
+  const [stageFilter, setStageFilter] = useState<"FG" | "16vos" | "8vos" | "CF" | "SF" | "F">("FG");
 
   // Auth state from Supabase
   const { user, isAdmin, isLoading: authLoading } = useAuth();
@@ -114,24 +111,22 @@ export default function App() {
 
   // Sync state to local storage when changed
   useEffect(() => {
-    localStorage.setItem("fifa_employees_v1", JSON.stringify(employees));
+    localStorage.setItem("fifa_employees_v2", JSON.stringify(employees));
   }, [employees]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_matches_v1", JSON.stringify(matches));
+    localStorage.setItem("fifa_matches_v2", JSON.stringify(matches));
   }, [matches]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_predictions_v1", JSON.stringify(predictions));
+    localStorage.setItem("fifa_predictions_v2", JSON.stringify(predictions));
   }, [predictions]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_active_emp_v1", activeEmployeeId);
+    localStorage.setItem("fifa_active_emp_v2", activeEmployeeId);
   }, [activeEmployeeId]);
 
-  useEffect(() => {
-    localStorage.setItem("fifa_simulated_time_v1", simulatedTime);
-  }, [simulatedTime]);
+  // (simulatedTime storage removed)
 
   const triggerToast = (text: string, type: "success" | "info" | "error" = "success") => {
     setBannerMsg({ text, type });
@@ -157,16 +152,7 @@ export default function App() {
     triggerToast(`¡Bienvenido ${name} al Prode de la Empresa! Se ha creado tu perfil.`, "success");
   };
 
-  const handleChangeSimulatedTime = (isoString: string) => {
-    setSimulatedTime(isoString);
-    const formatted = new Date(isoString).toLocaleDateString("es-ES", {
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    triggerToast(`Reloj oficial corporativo cambiado a: ${formatted}`, "info");
-  };
+  // (handleChangeSimulatedTime removed)
 
   // Add/Update prediction
   const handleUpdatePrediction = (matchId: string, scoreA: number, scoreB: number) => {
@@ -174,7 +160,7 @@ export default function App() {
     const match = matches.find((m) => m.id === matchId);
     if (!match) return;
 
-    const isLocked = new Date(simulatedTime) >= new Date(match.datetimeISO);
+    const isLocked = new Date() >= new Date(match.datetimeISO);
     if (isLocked) {
       triggerToast("Este partido ya comenzó. Tu predicción quedó bloqueada.", "error");
       return;
@@ -301,7 +287,7 @@ export default function App() {
 
   // Check if a match is locked (date comparison)
   const isMatchLocked = (match: Match): boolean => {
-    return new Date(simulatedTime) >= new Date(match.datetimeISO);
+    return new Date() >= new Date(match.datetimeISO);
   };
 
   // Helper to format match headers
@@ -336,7 +322,7 @@ export default function App() {
             {/* World Cup Trophy styled logo */}
             <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative group overflow-hidden shrink-0">
               <img
-                src="/resources/wct4sicon.ico"
+                src="/resources/Teams4Soft.ico"
                 alt="FIFA World Cup 2026"
                 className="w-full h-full object-contain select-none"
               />
@@ -351,10 +337,10 @@ export default function App() {
                   EDICIÓN 2026
                 </span>
               </div>
-              <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-0.5 mt-1 leading-tight">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-100 mb-0.5 mt-1 leading-tight">
                 Copa Mundial de la FIFA 2026
               </h1>
-              <p className="text-[10px] sm:text-xs text-slate-300 max-w-xl leading-snug hidden sm:block">
+              <p className="text-[10px] sm:text-xs text-slate-400 max-w-xl leading-snug hidden sm:block">
                 Pronósticos de la copa mundial de fútbol, tabla general de clasificación y árbol interactivo conectados para fomentar la cultura corporativa.
               </p>
             </div>
@@ -423,7 +409,14 @@ export default function App() {
             {/* Quick stats totals */}
             <div className="bg-slate-950/80 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-slate-900 text-right ml-auto md:ml-0">
               <span className="text-[9px] sm:text-[10px] text-slate-500 block uppercase tracking-wider font-bold">Participantes</span>
-              <span className="text-base sm:text-lg font-black text-white font-mono">{employees.length}</span>
+              <span className="text-base sm:text-lg font-black text-slate-100 font-mono">{employees.length}</span>
+            </div>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative group overflow-hidden shrink-0">
+              <img
+                src="/resources/wct4sicon.ico"
+                alt="FIFA World Cup 2026"
+                className="w-full h-full object-contain select-none"
+              />
             </div>
           </div>
         </div>
@@ -504,7 +497,6 @@ export default function App() {
                 predictions={predictions}
                 employees={employees}
                 activeEmployeeId={activeEmployeeId}
-                simulatedTime={simulatedTime}
                 onUpdatePrediction={handleUpdatePrediction}
                 onOpenSimulationModal={handleOpenSimulateModal}
               />
@@ -517,7 +509,7 @@ export default function App() {
 
               {/* Sub Stage Selector BAR */}
               <div id="substage-select-bar" className="flex flex-wrap gap-1 sm:gap-1.5 justify-start bg-slate-950/60 p-1.5 sm:p-2 border border-slate-800 rounded-xl sm:rounded-2xl">
-                {(["FG", "8vos", "CF", "SF", "F"] as const).map((stage) => {
+                {(["FG", "16vos", "8vos", "CF", "SF", "F"] as const).map((stage) => {
                   const isActive = stageFilter === stage;
                   return (
                     <button
@@ -533,25 +525,6 @@ export default function App() {
                   );
                 })}
               </div>
-
-              {/* Group Standings Section (Only visible for FG Tab) */}
-              {stageFilter === "FG" && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-base font-bold text-white uppercase tracking-wider">
-                        Tablas de Posición Simbólicas
-                      </h3>
-                      <p className="text-xs text-slate-400 font-sans">
-                        La clasificación de grupos se altera en vivo al simular resultados reales de los partidos del Grupo A y B.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Dynamic tables list */}
-                  <GroupTables teams={INITIAL_TEAMS} matches={matches} />
-                </div>
-              )}
 
               {/* Matches list for current selected sub-stage */}
               <div className="space-y-4">
@@ -595,21 +568,32 @@ export default function App() {
                         <div>
                           {/* Card top details */}
                           <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pb-2 border-b border-white/5 mb-3">
-                            <span className="flex items-center gap-1">
-                              📅 {match.date} · {match.time}
-                            </span>
+                            <div className="flex flex-col gap-1 items-start">
+                              <span className="flex items-center gap-1">
+                                📅 {match.date} · {match.time}
+                              </span>
+                              {match.venue && (
+                                <span className="text-[10px] text-slate-500 font-sans flex items-center gap-1">
+                                  📍 {match.venue}
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-1.5">
                               {match.groupName && (
                                 <span className="text-xs font-sans text-worldcup-accent bg-worldcup-accent/10 px-2 rounded">
                                   {match.groupName}
                                 </span>
                               )}
-                              {locked ? (
-                                <span className="text-red-400 flex items-center gap-0.5 font-bold font-sans">
-                                  <Lock className="w-3 h-3" /> Cerrado
+                              {finished ? (
+                                <span className="text-emerald-400 flex items-center gap-0.5 font-bold font-sans text-[10px]">
+                                  <Check className="w-3 h-3" /> Finalizado
+                                </span>
+                              ) : locked ? (
+                                <span className="text-amber-400 flex items-center gap-0.5 font-bold font-sans text-[10px] animate-pulse">
+                                  <Lock className="w-3 h-3" /> En Curso
                                 </span>
                               ) : (
-                                <span className="text-emerald-400 flex items-center gap-0.5 font-sans">
+                                <span className="text-emerald-400 flex items-center gap-0.5 font-sans text-[10px]">
                                   <Unlock className="w-3 h-3" /> Abierto
                                 </span>
                               )}
@@ -771,10 +755,8 @@ export default function App() {
           <ControlCenter
             employees={employees}
             activeEmployeeId={activeEmployeeId}
-            simulatedTime={simulatedTime}
             onSelectEmployee={handleSelectEmployee}
             onAddEmployee={handleAddEmployee}
-            onChangeSimulatedTime={handleChangeSimulatedTime}
           />
 
           {/* Dynamic leaderboard ranking table */}
