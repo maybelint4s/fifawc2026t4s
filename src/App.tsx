@@ -6,6 +6,8 @@ import { ControlCenter } from "./components/ControlCenter";
 import { GroupTables } from "./components/GroupTables";
 import { BracketTree } from "./components/BracketTree";
 import { FloatingMascot } from "./components/FloatingMascot";
+import { AdminLogin } from "./components/AdminLogin";
+import { AdminPanel } from "./components/AdminPanel";
 import {
   Trophy,
   Sparkles,
@@ -24,9 +26,13 @@ import {
   CalendarDays,
   Plus,
   Sun,
-  Moon
+  Moon,
+  Shield
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "./hooks/useAuth";
+import { AuthModal } from "./components/AuthModal";
+import { signOut } from "./services/auth";
 
 export default function App() {
   // --------- STATE STORAGE & PERSISTENCE ---------
@@ -77,6 +83,21 @@ export default function App() {
 
   // Highlighting specific stage filter under LISTA mode: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"
   const [stageFilter, setStageFilter] = useState<"FG" | "8vos" | "CF" | "SF" | "F">("FG");
+
+  // Auth state from Supabase
+  const { user, isAdmin, isLoading: authLoading } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [hasAutoOpenedAdminPanel, setHasAutoOpenedAdminPanel] = useState(false);
+
+  // Auto-open admin panel once when admin auth is detected
+  useEffect(() => {
+    if (isAdmin && !authLoading && !hasAutoOpenedAdminPanel) {
+      setShowAdminPanel(true);
+      setHasAutoOpenedAdminPanel(true);
+    }
+  }, [isAdmin, authLoading, hasAutoOpenedAdminPanel]);
 
   // State for administrative results modal
   const [selectedSimulateMatch, setSelectedSimulateMatch] = useState<Match | null>(null);
@@ -191,6 +212,20 @@ export default function App() {
       setMatches(INITIAL_MATCHES);
       triggerToast("Resultados oficiales reiniciados. ¡El árbol volvió al estado pendiente!", "info");
     }
+  };
+
+  // --------- AUTH HANDLERS ---------
+  const handleLogout = async () => {
+    await signOut();
+    setShowAdminPanel(false);
+    triggerToast("Sesión cerrada.", "info");
+  };
+
+  // --------- ADMIN HANDLERS ---------
+  const handleAdminLogin = () => {
+    setShowAdminLogin(false);
+    setShowAdminPanel(true);
+    triggerToast("Sesión de administrador iniciada correctamente.", "success");
   };
 
   // Submit Administrative real outcome
@@ -345,6 +380,45 @@ export default function App() {
               <Undo className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Reiniciar</span>
             </button>
+
+            {/* Auth / Admin access */}
+            {user ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (isAdmin) {
+                      setShowAdminPanel(true);
+                    } else {
+                      // For normal users, could open profile settings
+                    }
+                  }}
+                  className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl border text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    isAdmin
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                      : "border-slate-800 hover:bg-slate-900/60 text-slate-300"
+                  }`}
+                  title={isAdmin ? "Panel de Administración" : user.email}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{isAdmin ? "Admin" : user.email?.split("@")[0]}</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-900/60 text-slate-400 text-[11px] font-semibold transition-all"
+                >
+                  Salir
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all"
+                title="Iniciar sesión"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Entrar</span>
+              </button>
+            )}
 
             {/* Quick stats totals */}
             <div className="bg-slate-950/80 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-slate-900 text-right ml-auto md:ml-0">
@@ -848,9 +922,36 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Admin Login Modal */}
+      <AnimatePresence>
+        {showAdminLogin && (
+          <AdminLogin
+            onLogin={handleAdminLogin}
+            onClose={() => setShowAdminLogin(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Auth Modal */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <AuthModal onClose={() => setShowAuthModal(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Admin Panel Modal */}
+      <AnimatePresence>
+        {showAdminPanel && isAdmin && (
+          <AdminPanel
+            onLogout={handleLogout}
+            onClose={() => setShowAdminPanel(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Floating Mascot — visible globally */}
       <FloatingMascot
-      sizeClassName="w-32 md:w-48"
+        sizeClassName="w-32 md:w-48"
       />
 
     </div>
