@@ -34,6 +34,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "./hooks/useAuth";
 import { AuthModal } from "./components/AuthModal";
 import { signOut } from "./services/auth";
+import { getMascotPredictionMessage } from "./utils/mascotDialog";
 
 export default function App() {
   // --------- STATE STORAGE & PERSISTENCE ---------
@@ -109,6 +110,7 @@ export default function App() {
     text: "¡Bienvenido al Prode de la FIFA 2026! Predice marcadores, simula partidos y vive la emoción corporativa.",
     type: "info"
   });
+  const [mascotMessage, setMascotMessage] = useState<string | null>(null);
 
   // Sync state to local storage when changed
   useEffect(() => {
@@ -134,6 +136,15 @@ export default function App() {
     setTimeout(() => {
       setBannerMsg((prev) => (prev?.text === text ? null : prev));
     }, 4500);
+  };
+
+  const triggerMascotDialog = (match: Match, scoreA: number, scoreB: number) => {
+    const message = getMascotPredictionMessage(match, scoreA, scoreB);
+    setMascotMessage(message.text);
+    console.info(`[Mascota:${message.category}] ${message.text}`);
+    setTimeout(() => {
+      setMascotMessage((prev) => (prev === message.text ? null : prev));
+    }, 5200);
   };
 
   // --------- HANDLERS ---------
@@ -182,6 +193,7 @@ export default function App() {
         },
       ];
     });
+    triggerMascotDialog(match, scoreA, scoreB);
   };
 
   // Open administrative simulate dialog
@@ -934,6 +946,7 @@ export default function App() {
       {/* Floating Mascot — visible globally */}
       <FloatingMascot
         sizeClassName="w-32 md:w-48"
+        message={mascotMessage}
       />
 
     </div>
