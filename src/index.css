@@ -146,25 +146,24 @@ body {
   background: var(--color-accent);
 }
 
-/* Bracket Tree Horizontal Scroll */
-.bracket-scroll-container {
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+/* Bracket Tree: the viewport is a fixed-height window (horizontal axis clipped
+   for the zoom/translate effect). Each round lane scrolls vertically on its own,
+   so a long round never grows the outer container. */
+.bracket-lane {
   -webkit-overflow-scrolling: touch;
-  cursor: grab;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-card-hover) transparent;
 }
-.bracket-scroll-container::-webkit-scrollbar {
-  display: none;
+.bracket-lane::-webkit-scrollbar {
+  width: 5px;
 }
-.bracket-scroll-container:active {
-  cursor: grabbing;
+.bracket-lane::-webkit-scrollbar-track {
+  background: transparent;
 }
-.bracket-round-column {
-  scroll-snap-align: start;
-  flex-shrink: 0;
+.bracket-lane::-webkit-scrollbar-thumb {
+  background: var(--bg-card-hover);
+  border-radius: 4px;
 }
 .bracket-nav-scroll {
   scrollbar-width: none;
@@ -174,23 +173,8 @@ body {
   display: none;
 }
 
-/* Mobile touch improvements */
-@media (max-width: 639px) {
-  .bracket-scroll-container {
-    scroll-snap-type: x proximity;
-  }
-  .bracket-round-column {
-    scroll-snap-align: center;
-  }
-}
-
 /* Prevent text overflow globally */
 h1, h2, h3, h4, p, span, button {
   overflow-wrap: break-word;
   word-break: break-word;
-}
-
-/* Smooth column width transitions */
-.bracket-round-column {
-  transition: width 0.3s ease;
 }

@@ -80,7 +80,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.92, opacity: 0, y: 16 }}
         transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-        className="bg-[#111936] border border-slate-700 rounded-3xl p-6 max-w-md w-full shadow-2xl relative"
+        className="bg-worldcup-card border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative"
       >
         <button
           onClick={onClose}
@@ -120,7 +120,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
                 resetMessages();
               }}
               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${mode === "login"
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-emerald-600 text-slate-50"
                   : "text-slate-400 hover:text-white"
                 }`}
             >
@@ -133,7 +133,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
                 resetMessages();
               }}
               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${mode === "register"
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-emerald-600 text-slate-50"
                   : "text-slate-400 hover:text-white"
                 }`}
             >
@@ -158,7 +158,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
                     resetMessages();
                   }}
                   placeholder="Juan Pérez"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -178,7 +178,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
                   resetMessages();
                 }}
                 placeholder="usuario@empresa.com"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
                   resetMessages();
                 }}
                 placeholder="••••••••"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -225,7 +225,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "lo
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-2.5 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 mt-2 ${isAdminMode
+            className={`w-full py-2.5 text-slate-50 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 mt-2 ${isAdminMode
                 ? "bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800"
                 : "bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800"
               }`}

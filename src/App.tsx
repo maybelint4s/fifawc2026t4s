@@ -28,7 +28,10 @@ import {
   Plus,
   Sun,
   Moon,
-  Shield
+  Shield,
+  Search,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "./hooks/useAuth";
@@ -86,6 +89,11 @@ export default function App() {
 
   // Highlighting specific stage filter under LISTA mode: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"
   const [stageFilter, setStageFilter] = useState<"FG" | "16vos" | "8vos" | "CF" | "SF" | "F">("FG");
+
+  // List view: search + pagination (useful for stages with many fixtures, e.g. group stage)
+  const [listSearch, setListSearch] = useState("");
+  const [listPage, setListPage] = useState(1);
+  const LIST_PAGE_SIZE = 12;
 
   // Auth state from Supabase
   const { user, isAdmin, isLoading: authLoading } = useAuth();
@@ -362,8 +370,33 @@ export default function App() {
     (m) => m.stage === stageFilter
   );
 
+  // Apply search (team names, group, venue) over the stage-filtered matches
+  const searchedMatchesForList = filteredMatchesForList.filter((m) => {
+    const q = listSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      m.teamA.name.toLowerCase().includes(q) ||
+      m.teamB.name.toLowerCase().includes(q) ||
+      (m.groupName ?? "").toLowerCase().includes(q) ||
+      (m.venue ?? "").toLowerCase().includes(q)
+    );
+  });
+
+  // Pagination over the searched results
+  const listTotalPages = Math.max(1, Math.ceil(searchedMatchesForList.length / LIST_PAGE_SIZE));
+  const listCurrentPage = Math.min(listPage, listTotalPages);
+  const pagedMatchesForList = searchedMatchesForList.slice(
+    (listCurrentPage - 1) * LIST_PAGE_SIZE,
+    listCurrentPage * LIST_PAGE_SIZE
+  );
+
+  // Reset to first page when the stage or search query changes
+  useEffect(() => {
+    setListPage(1);
+  }, [stageFilter, listSearch]);
+
   return (
-    <div className="min-h-screen bg-worldcup-dark text-slate-100 flex flex-col font-sans transition-all duration-300">
+    <div className="min-h-screen w-full overflow-x-hidden bg-worldcup-dark text-slate-100 flex flex-col font-sans transition-all duration-300">
 
       {/* HEADER BANNER */}
       <header id="app-header" className="relative bg-gradient-to-r from-worldcup-header-from via-worldcup-header-via to-worldcup-header-to border-b border-worldcup-toast-border/85 shadow-2xl py-4 px-3 sm:py-6 sm:px-4 md:px-8">
@@ -499,7 +532,7 @@ export default function App() {
       <main className="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-4 sm:gap-6">
 
         {/* LEFT COMPONENT COLUMN (Tabs, Brackets, Group stages) */}
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 min-w-0 space-y-6">
 
           {/* TABS SELECTOR FOR BRACKET vs LIST/GROUPS */}
           <div className="flex flex-row p-1 bg-slate-950/90 rounded-2xl border border-slate-800 gap-1">
@@ -582,21 +615,44 @@ export default function App() {
 
               {/* Matches list for current selected sub-stage */}
               <div className="space-y-4">
-                <div className="bg-slate-950 p-4 border border-slate-800 rounded-2xl flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>⚽ Encuentros de:</span>
-                    <span className="text-worldcup-accent text-xs bg-worldcup-accent/15 px-2.5 py-0.5 border border-worldcup-accent/30 rounded">
-                      {getStageLabel(stageFilter)}
+                <div className="bg-slate-950 p-4 border border-slate-800 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>⚽ Encuentros de:</span>
+                      <span className="text-worldcup-accent text-xs bg-worldcup-accent/15 px-2.5 py-0.5 border border-worldcup-accent/30 rounded">
+                        {getStageLabel(stageFilter)}
+                      </span>
+                    </h3>
+                    <span className="text-xs text-slate-400 font-sans bg-slate-900 px-2.5 py-1 border border-slate-800 rounded-full font-mono">
+                      {searchedMatchesForList.length} Encuentro(s)
                     </span>
-                  </h3>
-                  <span className="text-xs text-slate-400 font-sans bg-slate-900 px-2.5 py-1 border border-slate-800 rounded-full font-mono">
-                    {filteredMatchesForList.length} Encuentro(s)
-                  </span>
+                  </div>
+
+                  {/* Search bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={listSearch}
+                      onChange={(e) => setListSearch(e.target.value)}
+                      placeholder="Buscar por equipo, grupo o sede…"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-9 py-2 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:border-worldcup-accent focus:outline-none transition-colors"
+                    />
+                    {listSearch && (
+                      <button
+                        onClick={() => setListSearch("")}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs font-mono px-1.5 rounded hover:bg-slate-800 transition-colors"
+                        title="Limpiar búsqueda"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Fixture custom Cards rendering */}
                 <div id="fixtures-list-container" className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-                  {filteredMatchesForList.map((match) => {
+                  {pagedMatchesForList.map((match) => {
                     const locked = isMatchLocked(match);
                     const finished = match.status === "Finished";
 
@@ -792,9 +848,53 @@ export default function App() {
                   })}
                 </div>
 
-                {filteredMatchesForList.length === 0 && (
+                {/* Pagination controls */}
+                {searchedMatchesForList.length > 0 && listTotalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 pt-2">
+                    <button
+                      onClick={() => setListPage((p) => Math.max(1, p - 1))}
+                      disabled={listCurrentPage === 1}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-300 hover:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" /> Anterior
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: listTotalPages }).map((_, i) => {
+                        const page = i + 1;
+                        const isActive = page === listCurrentPage;
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => setListPage(page)}
+                            className={`w-7 h-7 rounded-lg text-xs font-mono font-bold transition-all ${isActive
+                              ? "bg-worldcup-accent text-slate-900 shadow"
+                              : "bg-slate-900/60 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800"
+                              }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => setListPage((p) => Math.min(listTotalPages, p + 1))}
+                      disabled={listCurrentPage === listTotalPages}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900/60 text-xs font-semibold text-slate-300 hover:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                      Siguiente <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {searchedMatchesForList.length === 0 && (
                   <div className="text-center py-12 bg-worldcup-card/30 border border-slate-800/80 rounded-2xl text-slate-400">
-                    <p className="text-sm">No hay partidos configurados para esta etapa actualmente.</p>
+                    <p className="text-sm">
+                      {listSearch.trim()
+                        ? `No se encontraron encuentros para “${listSearch.trim()}”.`
+                        : "No hay partidos configurados para esta etapa actualmente."}
+                    </p>
                   </div>
                 )}
               </div>

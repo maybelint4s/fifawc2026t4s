@@ -10,7 +10,10 @@ export function useProfiles() {
     getProfiles,
     {
       refreshInterval: 60000,
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      keepPreviousData: true,
+      dedupingInterval: 30000,
     }
   );
 
@@ -28,7 +31,9 @@ export function useLeaderboard() {
     getLeaderboard,
     {
       refreshInterval: 30000,
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
+      keepPreviousData: true,
+      dedupingInterval: 15000,
     }
   );
 
