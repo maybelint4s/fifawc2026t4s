@@ -36,7 +36,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
 
   return (
     <div id="control-center" className="bg-worldcup-card border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
-      
+
       {/* Active User Switcher section */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -68,7 +68,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
         </div>
 
         {/* Quick select employee switch buttons */}
-        <div className="mt-3">
+        {/*<div className="mt-3">
           <span className="text-[10px] text-slate-400 uppercase tracking-widest block mb-1.5">
             Cambiar empleado rápidamente:
           </span>
@@ -91,14 +91,14 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
               );
             })}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Add Employee Form */}
       {showAddForm && (
         <form onSubmit={handleCreateEmployee} className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
           <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Añadir Nuevo Participante</h4>
-          
+
           <div>
             <label className="block text-[10px] text-slate-400 uppercase mb-1">Nombre Completo</label>
             <input
