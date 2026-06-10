@@ -37,6 +37,8 @@ import { signOut } from "./services/auth";
 import { getMascotPredictionMessage } from "./utils/mascotDialog";
 
 export default function App() {
+  const assetUrl = (path: string) => `${import.meta.env.BASE_URL}${path}`;
+
   // --------- STATE STORAGE & PERSISTENCE ---------
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     const saved = localStorage.getItem("fifa_theme");
@@ -335,7 +337,7 @@ export default function App() {
             {/* World Cup Trophy styled logo */}
             <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative group overflow-hidden shrink-0">
               <img
-                src="/resources/Teams4Soft.ico"
+                src={assetUrl("resources/Teams4Soft.ico")}
                 alt="FIFA World Cup 2026"
                 className="w-full h-full object-contain select-none"
               />
@@ -425,7 +427,7 @@ export default function App() {
             </div>
             <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative group overflow-hidden shrink-0">
               <img
-                src="/resources/wct4sicon.ico"
+                src={assetUrl("resources/wct4sicon.ico")}
                 alt="FIFA World Cup 2026"
                 className="w-full h-full object-contain select-none"
               />
