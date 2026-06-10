@@ -54,6 +54,65 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Add Employee Form */}
+      {showAddForm && (
+        <form onSubmit={handleCreateEmployee} className="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+          <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Añadir Nuevo Participante</h4>
+
+          <div>
+            <label className="block text-[10px] text-slate-400 uppercase mb-1">Nombre Completo</label>
+            <input
+              type="text"
+              value={newEmpName}
+              onChange={(e) => setNewEmpName(e.target.value)}
+              placeholder="Ej. Martín Bianchi"
+              className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-100 focus:border-worldcup-accent focus:outline-none"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-[10px] text-slate-400 uppercase mb-1">Rol / Cargo</label>
+              <input
+                type="text"
+                value={newEmpRole}
+                onChange={(e) => setNewEmpRole(e.target.value)}
+                placeholder="Ej. Developer"
+                className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-100 focus:border-worldcup-accent focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] text-slate-400 uppercase mb-1">Avatar / Emoji</label>
+              <select
+                value={newEmpAvatar}
+                onChange={(e) => setNewEmpAvatar(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-100 focus:border-worldcup-accent focus:outline-none"
+              >
+                <option value="⚽">⚽ Balón</option>
+                <option value="👨‍💻">👨‍💻 Dev</option>
+                <option value="👩‍💻">👩‍💻 Dev Mujer</option>
+                <option value="🎯">🎯 Diana</option>
+                <option value="🦁">🦁 León</option>
+                <option value="🦅">🦅 Águila</option>
+                <option value="🍕">🍕 Pizza</option>
+                <option value="🏆">🏆 Copa</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-worldcup-accent hover:bg-yellow-500 text-slate-900 font-bold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1"
+          >
+            Añadir al juego
+          </button>
+        </form>
+      )}
+
+      {/* Clock section removed */}
+
     </div>
   );
 };

@@ -38,8 +38,8 @@ const adminSupabase = createClient<Database>(url, serviceRoleKey, {
 });
 
 const timestamp = Date.now();
-const testEmail = `prode.test.${timestamp}@testmail.com`;
-const testPassword = "TestPassword123!";
+const testEmail = `quiniela.test.${timestamp}@testmail.com`;
+const testPassword = "Password123!";
 let createdUserId: string | null = null;
 
 function logStep(n: number, text: string) {
