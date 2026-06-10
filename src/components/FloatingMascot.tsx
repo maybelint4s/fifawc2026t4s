@@ -6,6 +6,8 @@ interface FloatingMascotProps {
 }
 
 export const FloatingMascot = ({ sizeClassName = "w-40 md:w-56", message }: FloatingMascotProps) => {
+  const mascotUrl = `${import.meta.env.BASE_URL}resources/mascota.gif`;
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.5, y: 20 }}
@@ -31,7 +33,7 @@ export const FloatingMascot = ({ sizeClassName = "w-40 md:w-56", message }: Floa
         </motion.div>
       )}
       <motion.img
-        src="/resources/mascota.gif"
+        src={mascotUrl}
         alt="Mascota Mundial 2026"
         className={`${sizeClassName} h-auto object-contain drop-shadow-2xl`}
         animate={{ y: [0, -8, 0] }}
