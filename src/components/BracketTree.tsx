@@ -10,7 +10,6 @@ interface BracketTreeProps {
   predictions: Prediction[];
   employees: Employee[];
   activeEmployeeId: string;
-  simulatedTime: string;
   onUpdatePrediction: (matchId: string, teamAVal: number, teamBVal: number) => void;
   onOpenSimulationModal: (match: Match) => void;
 }
@@ -51,7 +50,6 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   predictions,
   employees,
   activeEmployeeId,
-  simulatedTime,
   onUpdatePrediction,
   onOpenSimulationModal,
 }) => {
@@ -65,7 +63,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   const isDrag = useRef(false);
 
   const isMatchLocked = (match: Match): boolean => {
-    return new Date(simulatedTime) >= new Date(match.datetimeISO);
+    return new Date() >= new Date(match.datetimeISO);
   };
 
   const activeEmployee = employees.find((e) => e.id === activeEmployeeId);
@@ -217,7 +215,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
         className="relative h-full flex items-center"
       >
         <div
-          className={`relative bg-[#111936] hover:bg-[#18234a] border ${
+          className={`relative bg-worldcup-card hover:bg-worldcup-card-hover border ${
             hasResult
               ? "border-emerald-700/60"
               : locked
@@ -243,7 +241,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 <span className="text-lg">{match.teamA.flag || "🏳️"}</span>
                 <span
                   className={`text-xs truncate ${
-                    match.teamA.isPlaceholder ? "text-slate-400 italic" : "text-white font-semibold"
+                    match.teamA.isPlaceholder ? "text-slate-400 italic" : "text-slate-100 font-semibold"
                   }`}
                 >
                   {match.teamA.name}
@@ -262,7 +260,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 <span className="text-lg">{match.teamB.flag || "🏳️"}</span>
                 <span
                   className={`text-xs truncate ${
-                    match.teamB.isPlaceholder ? "text-slate-400 italic" : "text-white font-semibold"
+                    match.teamB.isPlaceholder ? "text-slate-400 italic" : "text-slate-100 font-semibold"
                   }`}
                 >
                   {match.teamB.name}
@@ -315,7 +313,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                       const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
                       onUpdatePrediction(match.id, val, prediction?.predictedScoreB ?? 0);
                     }}
-                    className="w-8 h-6 bg-slate-900 border border-slate-700/80 rounded text-center text-xs text-white font-mono focus:border-worldcup-accent focus:outline-none"
+                    className="w-8 h-6 bg-slate-900 border border-slate-700/80 rounded text-center text-xs text-slate-100 font-mono focus:border-worldcup-accent focus:outline-none"
                   />
                   <span className="text-slate-600">-</span>
                   <input
@@ -327,7 +325,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                       const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
                       onUpdatePrediction(match.id, prediction?.predictedScoreA ?? 0, val);
                     }}
-                    className="w-8 h-6 bg-slate-900 border border-slate-700/80 rounded text-center text-xs text-white font-mono focus:border-worldcup-accent focus:outline-none"
+                    className="w-8 h-6 bg-slate-900 border border-slate-700/80 rounded text-center text-xs text-slate-100 font-mono focus:border-worldcup-accent focus:outline-none"
                   />
                 </div>
               </div>
@@ -369,7 +367,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
         whileInView={{ opacity: 1, scale: 1, x: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
-        className="bracket-group-card bg-[#111936] border border-slate-800/80 rounded-xl p-2.5 hover:border-slate-700 transition-colors"
+        className="bracket-group-card bg-worldcup-card border border-slate-800/80 rounded-xl p-2.5 hover:border-slate-700 transition-colors"
       >
         <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 flex items-center justify-between">
           <span>{groupName}</span>
@@ -391,7 +389,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                   {i + 1}
                 </span>
                 <span className="text-base leading-none">{team.flag}</span>
-                <span className={`truncate ${i < 2 ? "text-white font-semibold" : "text-slate-400"}`}>{team.name}</span>
+                <span className={`truncate ${i < 2 ? "text-slate-100 font-semibold" : "text-slate-400"}`}>{team.name}</span>
               </span>
               <span className="font-mono font-bold text-slate-300">{team.pts}</span>
             </div>

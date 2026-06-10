@@ -25,7 +25,7 @@ export interface Match {
   status: "Pending" | "Live" | "Finished";
   date: string; // e.g., "Sáb, jul 4"
   time: string; // e.g., "5:00 p.m."
-  datetimeISO: string; // e.g. "2026-07-04T17:00:00" - used with simulated corporate time
+  datetimeISO: string; // e.g. "2026-07-04T17:00:00" - used for real-time locking
   venue?: string; // e.g., "Estadio Azteca, CDMX"
   nextMatchId?: string; // id of match that advances
   nextMatchPosition?: "teamA" | "teamB"; // position in next match (teamA or teamB)

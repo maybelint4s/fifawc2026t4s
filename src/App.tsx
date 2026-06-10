@@ -32,7 +32,7 @@ export default function App() {
   // --------- STATE STORAGE & PERSISTENCE ---------
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     const saved = localStorage.getItem("fifa_theme");
-    return (saved === "light" || saved === "dark") ? saved : "dark";
+    return (saved === "light" || saved === "dark") ? saved : "light";
   });
 
   useEffect(() => {
@@ -67,10 +67,7 @@ export default function App() {
     return saved || "emp1";
   });
 
-  const [simulatedTime, setSimulatedTime] = useState<string>(() => {
-    const saved = localStorage.getItem("fifa_simulated_time_v2");
-    return saved || "2026-06-11T12:00:00"; // Begins day of Opener
-  });
+  // Real-time locking: uses actual system time (new Date()) instead of simulated time
 
   // Active UI Tabs: "ARBOL" (Interactive bracket tree) or "LISTA" (Fixtures list & group tables)
   const [activeTab, setActiveTab] = useState<"ARBOL" | "LISTA">("ARBOL");
@@ -108,9 +105,7 @@ export default function App() {
     localStorage.setItem("fifa_active_emp_v2", activeEmployeeId);
   }, [activeEmployeeId]);
 
-  useEffect(() => {
-    localStorage.setItem("fifa_simulated_time_v2", simulatedTime);
-  }, [simulatedTime]);
+  // (simulatedTime storage removed)
 
   const triggerToast = (text: string, type: "success" | "info" | "error" = "success") => {
     setBannerMsg({ text, type });
@@ -136,16 +131,7 @@ export default function App() {
     triggerToast(`¡Bienvenido ${name} al Prode de la Empresa! Se ha creado tu perfil.`, "success");
   };
 
-  const handleChangeSimulatedTime = (isoString: string) => {
-    setSimulatedTime(isoString);
-    const formatted = new Date(isoString).toLocaleDateString("es-ES", {
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    triggerToast(`Reloj oficial corporativo cambiado a: ${formatted}`, "info");
-  };
+  // (handleChangeSimulatedTime removed)
 
   // Add/Update prediction
   const handleUpdatePrediction = (matchId: string, scoreA: number, scoreB: number) => {
@@ -153,7 +139,7 @@ export default function App() {
     const match = matches.find((m) => m.id === matchId);
     if (!match) return;
 
-    const isLocked = new Date(simulatedTime) >= new Date(match.datetimeISO);
+    const isLocked = new Date() >= new Date(match.datetimeISO);
     if (isLocked) {
       triggerToast("Este partido ya comenzó. Tu predicción quedó bloqueada.", "error");
       return;
@@ -266,7 +252,7 @@ export default function App() {
 
   // Check if a match is locked (date comparison)
   const isMatchLocked = (match: Match): boolean => {
-    return new Date(simulatedTime) >= new Date(match.datetimeISO);
+    return new Date() >= new Date(match.datetimeISO);
   };
 
   // Helper to format match headers
@@ -301,7 +287,7 @@ export default function App() {
             {/* World Cup Trophy styled logo */}
             <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative group overflow-hidden shrink-0">
               <img
-                src="/resources/wct4sicon.ico"
+                src="/resources/Teams4Soft.ico"
                 alt="FIFA World Cup 2026"
                 className="w-full h-full object-contain select-none"
               />
@@ -316,10 +302,10 @@ export default function App() {
                   EDICIÓN 2026
                 </span>
               </div>
-              <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-0.5 mt-1 leading-tight">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-100 mb-0.5 mt-1 leading-tight">
                 Copa Mundial de la FIFA 2026
               </h1>
-              <p className="text-[10px] sm:text-xs text-slate-300 max-w-xl leading-snug hidden sm:block">
+              <p className="text-[10px] sm:text-xs text-slate-400 max-w-xl leading-snug hidden sm:block">
                 Pronósticos de la copa mundial de fútbol, tabla general de clasificación y árbol interactivo conectados para fomentar la cultura corporativa.
               </p>
             </div>
@@ -349,7 +335,14 @@ export default function App() {
             {/* Quick stats totals */}
             <div className="bg-slate-950/80 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-slate-900 text-right ml-auto md:ml-0">
               <span className="text-[9px] sm:text-[10px] text-slate-500 block uppercase tracking-wider font-bold">Participantes</span>
-              <span className="text-base sm:text-lg font-black text-white font-mono">{employees.length}</span>
+              <span className="text-base sm:text-lg font-black text-slate-100 font-mono">{employees.length}</span>
+            </div>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center relative group overflow-hidden shrink-0">
+              <img
+                src="/resources/wct4sicon.ico"
+                alt="FIFA World Cup 2026"
+                className="w-full h-full object-contain select-none"
+              />
             </div>
           </div>
         </div>
@@ -430,7 +423,6 @@ export default function App() {
                 predictions={predictions}
                 employees={employees}
                 activeEmployeeId={activeEmployeeId}
-                simulatedTime={simulatedTime}
                 onUpdatePrediction={handleUpdatePrediction}
                 onOpenSimulationModal={handleOpenSimulateModal}
               />
@@ -537,12 +529,16 @@ export default function App() {
                                   {match.groupName}
                                 </span>
                               )}
-                              {locked ? (
-                                <span className="text-red-400 flex items-center gap-0.5 font-bold font-sans">
-                                  <Lock className="w-3 h-3" /> Cerrado
+                              {finished ? (
+                                <span className="text-emerald-400 flex items-center gap-0.5 font-bold font-sans text-[10px]">
+                                  <Check className="w-3 h-3" /> Finalizado
+                                </span>
+                              ) : locked ? (
+                                <span className="text-amber-400 flex items-center gap-0.5 font-bold font-sans text-[10px] animate-pulse">
+                                  <Lock className="w-3 h-3" /> En Curso
                                 </span>
                               ) : (
-                                <span className="text-emerald-400 flex items-center gap-0.5 font-sans">
+                                <span className="text-emerald-400 flex items-center gap-0.5 font-sans text-[10px]">
                                   <Unlock className="w-3 h-3" /> Abierto
                                 </span>
                               )}
@@ -704,10 +700,8 @@ export default function App() {
           <ControlCenter
             employees={employees}
             activeEmployeeId={activeEmployeeId}
-            simulatedTime={simulatedTime}
             onSelectEmployee={handleSelectEmployee}
             onAddEmployee={handleAddEmployee}
-            onChangeSimulatedTime={handleChangeSimulatedTime}
           />
 
           {/* Dynamic leaderboard ranking table */}
@@ -857,7 +851,7 @@ export default function App() {
 
       {/* Floating Mascot — visible globally */}
       <FloatingMascot
-      sizeClassName="w-32 md:w-48"
+        sizeClassName="w-32 md:w-48"
       />
 
     </div>
