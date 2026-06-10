@@ -1,6 +1,7 @@
 import React from "react";
 import { Team, Match } from "../types";
 import { INITIAL_TEAMS } from "../data";
+import { TeamFlag } from "./TeamFlag";
 
 interface GroupTablesProps {
   teams: Team[];
@@ -90,7 +91,7 @@ export const GroupTables: React.FC<GroupTablesProps> = ({ teams, matches }) => {
               >
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-slate-400 w-3">{tIdx + 1}</span>
-                  <span className="text-lg select-none">{team.flag}</span>
+                  <TeamFlag flag={team.flag} className="text-lg" />
                   <span className="font-semibold text-white">{team.name}</span>
                 </div>
 

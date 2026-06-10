@@ -91,7 +91,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       </div>
 
       <p className="text-xs text-slate-400 mb-4 font-sans leading-relaxed">
-        Los puntos se actualizan solos al finalizar los encuentros. Haz clic en un miembro para predecir como él/ella.
+        Los puntos se actualizan solos al finalizar los encuentros.
       </p>
 
       {/* Leaderboard list */}
@@ -104,8 +104,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             <div
               key={item.employeeId}
               id={`leaderboard-item-${item.employeeId}`}
-              onClick={() => onSelectEmployee(item.employeeId)}
-              className={`p-2.5 sm:p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-between border gap-2 ${isActive
+              className={`p-2.5 sm:p-3.5 rounded-xl transition-all flex items-center justify-between border gap-2 ${isActive
                   ? "bg-slate-900/90 border-worldcup-accent ring-2 ring-worldcup-accent/30 shadow-md transform scale-[1.01]"
                   : "bg-slate-900/40 hover:bg-slate-900/80 border-slate-800/80"
                 }`}

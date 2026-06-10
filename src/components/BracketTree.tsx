@@ -4,6 +4,7 @@ import { INITIAL_TEAMS } from "../data";
 import { Lock, Unlock, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { animate, stagger } from "animejs";
+import { TeamFlag } from "./TeamFlag";
 
 interface BracketTreeProps {
   matches: Match[];
@@ -233,12 +234,11 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
               {locked ? "Cerrado" : "Abierto"}
             </span>
           </div>
-
-          {/* Teams */}
+          {/* Teams */}
           <div className="space-y-1.5 mb-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-lg">{match.teamA.flag || "🏳️"}</span>
+                <TeamFlag flag={match.teamA.flag || "🏳️"} className="text-lg" />
                 <span
                   className={`text-xs truncate ${
                     match.teamA.isPlaceholder ? "text-slate-400 italic" : "text-slate-100 font-semibold"
@@ -257,7 +257,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-lg">{match.teamB.flag || "🏳️"}</span>
+                <TeamFlag flag={match.teamB.flag || "🏳️"} className="text-lg" />
                 <span
                   className={`text-xs truncate ${
                     match.teamB.isPlaceholder ? "text-slate-400 italic" : "text-slate-100 font-semibold"
@@ -388,7 +388,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 >
                   {i + 1}
                 </span>
-                <span className="text-base leading-none">{team.flag}</span>
+                <TeamFlag flag={team.flag} className="text-base" />
                 <span className={`truncate ${i < 2 ? "text-slate-100 font-semibold" : "text-slate-400"}`}>{team.name}</span>
               </span>
               <span className="font-mono font-bold text-slate-300">{team.pts}</span>

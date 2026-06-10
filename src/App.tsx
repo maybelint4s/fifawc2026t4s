@@ -6,6 +6,7 @@ import { ControlCenter } from "./components/ControlCenter";
 import { GroupTables } from "./components/GroupTables";
 import { BracketTree } from "./components/BracketTree";
 import { FloatingMascot } from "./components/FloatingMascot";
+import { TeamFlag } from "./components/TeamFlag";
 import {
   Trophy,
   Sparkles,
@@ -48,22 +49,22 @@ export default function App() {
   }, [theme]);
 
   const [employees, setEmployees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem("fifa_employees_v2");
+    const saved = localStorage.getItem("fifa_employees_v3");
     return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
   });
 
   const [matches, setMatches] = useState<Match[]>(() => {
-    const saved = localStorage.getItem("fifa_matches_v2");
+    const saved = localStorage.getItem("fifa_matches_v3");
     return saved ? JSON.parse(saved) : INITIAL_MATCHES;
   });
 
   const [predictions, setPredictions] = useState<Prediction[]>(() => {
-    const saved = localStorage.getItem("fifa_predictions_v2");
+    const saved = localStorage.getItem("fifa_predictions_v3");
     return saved ? JSON.parse(saved) : PRELOADED_PREDICTIONS;
   });
 
   const [activeEmployeeId, setActiveEmployeeId] = useState<string>(() => {
-    const saved = localStorage.getItem("fifa_active_emp_v2");
+    const saved = localStorage.getItem("fifa_active_emp_v3");
     return saved || "emp1";
   });
 
@@ -90,19 +91,19 @@ export default function App() {
 
   // Sync state to local storage when changed
   useEffect(() => {
-    localStorage.setItem("fifa_employees_v2", JSON.stringify(employees));
+    localStorage.setItem("fifa_employees_v3", JSON.stringify(employees));
   }, [employees]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_matches_v2", JSON.stringify(matches));
+    localStorage.setItem("fifa_matches_v3", JSON.stringify(matches));
   }, [matches]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_predictions_v2", JSON.stringify(predictions));
+    localStorage.setItem("fifa_predictions_v3", JSON.stringify(predictions));
   }, [predictions]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_active_emp_v2", activeEmployeeId);
+    localStorage.setItem("fifa_active_emp_v3", activeEmployeeId);
   }, [activeEmployeeId]);
 
   // (simulatedTime storage removed)
@@ -530,7 +531,7 @@ export default function App() {
                           <div className="flex items-center justify-between mb-4">
                             {/* Team A display */}
                             <div className="flex flex-col items-center flex-1 max-w-[40%] text-center">
-                              <span className="text-3xl mb-1.5 select-none">{match.teamA.flag || "🏳️"}</span>
+                              <TeamFlag flag={match.teamA.flag || "🏳️"} className="text-3xl mb-1.5" />
                               <span className={`text-xs font-extrabold truncate w-full ${match.teamA.isPlaceholder ? "text-slate-500 italic" : "text-white"}`}>
                                 {match.teamA.name}
                               </span>
@@ -557,7 +558,7 @@ export default function App() {
 
                             {/* Team B display */}
                             <div className="flex flex-col items-center flex-1 max-w-[40%] text-center">
-                              <span className="text-3xl mb-1.5 select-none">{match.teamB.flag || "🏳️"}</span>
+                              <TeamFlag flag={match.teamB.flag || "🏳️"} className="text-3xl mb-1.5" />
                               <span className={`text-xs font-extrabold truncate w-full ${match.teamB.isPlaceholder ? "text-slate-505 italic" : "text-white"}`}>
                                 {match.teamB.name}
                               </span>
@@ -732,7 +733,7 @@ export default function App() {
                 <div className="flex items-center justify-between text-xs md:text-sm font-sans">
                   {/* Team A */}
                   <div className="flex flex-col items-center flex-1">
-                    <span className="text-3xl select-none mb-1">{selectedSimulateMatch.teamA.flag || "🏳️"}</span>
+                    <TeamFlag flag={selectedSimulateMatch.teamA.flag || "🏳️"} className="text-3xl mb-1" />
                     <span className="font-bold text-white truncate max-w-[120px]">{selectedSimulateMatch.teamA.name}</span>
                   </div>
 
@@ -757,7 +758,7 @@ export default function App() {
 
                   {/* Team B */}
                   <div className="flex flex-col items-center flex-1">
-                    <span className="text-3xl select-none mb-1">{selectedSimulateMatch.teamB.flag || "🏳️"}</span>
+                    <TeamFlag flag={selectedSimulateMatch.teamB.flag || "🏳️"} className="text-3xl mb-1" />
                     <span className="font-bold text-white truncate max-w-[120px]">{selectedSimulateMatch.teamB.name}</span>
                   </div>
                 </div>
