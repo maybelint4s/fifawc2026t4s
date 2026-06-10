@@ -1,5 +1,5 @@
 -- ============================================================
--- FIFA World Cup 2026 Prode - Supabase Initial Schema
+-- FIFA World Cup 2026 Quiniela - Supabase Initial Schema
 -- ============================================================
 -- This script sets up the complete database for the corporate
 -- prediction platform including:

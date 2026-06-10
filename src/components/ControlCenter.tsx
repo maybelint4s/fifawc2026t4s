@@ -145,7 +145,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({
             type="submit"
             className="w-full bg-worldcup-accent hover:bg-yellow-500 text-slate-900 font-bold py-1.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1"
           >
-            Añadir a la Polla Copa 2026
+            Añadir al juego
           </button>
         </form>
       )}

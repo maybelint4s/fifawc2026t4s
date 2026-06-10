@@ -90,23 +90,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
 
         <div className="text-center mb-5">
           <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 border ${
-              isAdminMode
+            className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 border ${isAdminMode
                 ? "bg-indigo-500/20 border-indigo-500/30 text-indigo-400"
                 : "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
-            }`}
+              }`}
           >
             {isAdminMode ? <Shield className="w-6 h-6" /> : <Globe className="w-6 h-6" />}
           </div>
           <h3 className="text-lg font-black text-white">
-            {isAdminMode ? "Acceso Administrador" : mode === "login" ? "Bienvenido al Prode" : "Crear cuenta"}
+            {isAdminMode ? "Acceso Administrador" : mode === "login" ? "Bienvenido a la Quiniela" : "Crear cuenta"}
           </h3>
           <p className="text-xs text-slate-400 mt-1">
             {isAdminMode
               ? "Ingresa las credenciales de administrador."
               : mode === "login"
-              ? "Inicia sesión para registrar tus predicciones."
-              : "Regístrate con tu correo corporativo autorizado."}
+                ? "Inicia sesión para registrar tus predicciones."
+                : "Regístrate con tu correo corporativo autorizado."}
           </p>
         </div>
 
@@ -119,11 +118,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                 setMode("login");
                 resetMessages();
               }}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
-                mode === "login"
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${mode === "login"
                   ? "bg-emerald-600 text-white"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               <LogIn className="w-3 h-3" /> Entrar
             </button>
@@ -133,11 +131,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                 setMode("register");
                 resetMessages();
               }}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
-                mode === "register"
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${mode === "register"
                   ? "bg-emerald-600 text-white"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               <UserPlus className="w-3 h-3" /> Registrarme
             </button>
@@ -227,11 +224,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-2.5 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 mt-2 ${
-              isAdminMode
+            className={`w-full py-2.5 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 mt-2 ${isAdminMode
                 ? "bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800"
                 : "bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800"
-            }`}
+              }`}
           >
             {isLoading ? (
               <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -243,10 +239,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             {isLoading
               ? "Procesando..."
               : mode === "register"
-              ? "Crear cuenta"
-              : isAdminMode
-              ? "Ingresar como Admin"
-              : "Iniciar sesión"}
+                ? "Crear cuenta"
+                : isAdminMode
+                  ? "Ingresar como Admin"
+                  : "Iniciar sesión"}
           </button>
         </form>
 

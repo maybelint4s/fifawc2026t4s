@@ -107,7 +107,7 @@ export default function App() {
 
   // Notification Banner
   const [bannerMsg, setBannerMsg] = useState<{ text: string; type: "success" | "info" | "error" } | null>({
-    text: "¡Bienvenido al Prode de la FIFA 2026! Predice marcadores, simula partidos y vive la emoción corporativa.",
+    text: "¡Bienvenido al Quiniela de la FIFA 2026! Predice marcadores, simula partidos y vive la emoción corporativa.",
     type: "info"
   });
   const [mascotMessage, setMascotMessage] = useState<string | null>(null);
@@ -161,7 +161,7 @@ export default function App() {
     const newEmp: Employee = { id: newId, name, role, avatar };
     setEmployees((prev) => [...prev, newEmp]);
     setActiveEmployeeId(newId);
-    triggerToast(`¡Bienvenido ${name} al Prode de la Empresa! Se ha creado tu perfil.`, "success");
+    triggerToast(`¡Bienvenido ${name} a la Quiniela de la Empresa! Se ha creado tu perfil.`, "success");
   };
 
   // (handleChangeSimulatedTime removed)
@@ -392,8 +392,8 @@ export default function App() {
                     }
                   }}
                   className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl border text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all ${isAdmin
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                      : "border-slate-800 hover:bg-slate-900/60 text-slate-300"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                    : "border-slate-800 hover:bg-slate-900/60 text-slate-300"
                     }`}
                   title={isAdmin ? "Panel de Administración" : user.email}
                 >
@@ -787,8 +787,7 @@ export default function App() {
       {/* FOOTER */}
       <footer className="bg-slate-950 py-8 px-4 text-center border-t border-slate-900 text-xs text-slate-500 font-sans mt-12">
         <div className="max-w-7xl mx-auto space-y-2">
-          <p>© 2026 Copa Mundial de la FIFA - Prode de Integración Laboral. Todos los derechos reservados.</p>
-          <p>Optimizado para Chrome, Safari, Firefox y visualización móvil responsive en Google AI Studio.</p>
+          <p>© 2026 Copa Mundial de la FIFA - Quiniela de Integración Laboral. Todos los derechos reservados.</p>
         </div>
       </footer>
 

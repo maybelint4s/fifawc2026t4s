@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Script de validación del backend de Supabase para el Prode FIFA 2026.
+ * Script de validación del backend de Supabase para el Quiniela FIFA 2026.
  *
  * Verifica:
  * 1. Conectividad y credenciales.
