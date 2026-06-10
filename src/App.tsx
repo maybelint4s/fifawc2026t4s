@@ -161,9 +161,9 @@ export default function App() {
     const match = matches.find((m) => m.id === matchId);
     if (!match) return;
 
-    const isLocked = new Date() >= new Date(match.datetimeISO);
+    const isLocked = isMatchLocked(match);
     if (isLocked) {
-      triggerToast("Este partido ya comenzó. Tu predicción quedó bloqueada.", "error");
+      triggerToast("Este partido ya comenzó o fue cerrado por el administrador. Tu predicción quedó bloqueada.", "error");
       return;
     }
 
@@ -286,9 +286,9 @@ export default function App() {
     );
   };
 
-  // Check if a match is locked (date comparison)
+  // Check if a match is locked (date comparison or manual status override)
   const isMatchLocked = (match: Match): boolean => {
-    return new Date() >= new Date(match.datetimeISO);
+    return match.status === "Finished" || match.status === "Live" || new Date() >= new Date(match.datetimeISO);
   };
 
   // Helper to format match headers

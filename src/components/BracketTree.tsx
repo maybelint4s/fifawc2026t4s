@@ -64,7 +64,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   const isDrag = useRef(false);
 
   const isMatchLocked = (match: Match): boolean => {
-    return new Date() >= new Date(match.datetimeISO);
+    return match.status === "Finished" || match.status === "Live" || new Date() >= new Date(match.datetimeISO);
   };
 
   const activeEmployee = employees.find((e) => e.id === activeEmployeeId);
