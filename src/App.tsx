@@ -452,25 +452,6 @@ export default function App() {
                 })}
               </div>
 
-              {/* Group Standings Section (Only visible for FG Tab) */}
-              {stageFilter === "FG" && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-base font-bold text-white uppercase tracking-wider">
-                        Tablas de Posición Simbólicas
-                      </h3>
-                      <p className="text-xs text-slate-400 font-sans">
-                        La clasificación de grupos se altera en vivo al simular resultados reales de los partidos del Grupo A y B.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Dynamic tables list */}
-                  <GroupTables teams={INITIAL_TEAMS} matches={matches} />
-                </div>
-              )}
-
               {/* Matches list for current selected sub-stage */}
               <div className="space-y-4">
                 <div className="bg-slate-950 p-4 border border-slate-800 rounded-2xl flex items-center justify-between">
