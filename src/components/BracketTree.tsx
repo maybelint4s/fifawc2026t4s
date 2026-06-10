@@ -17,6 +17,7 @@ interface BracketTreeProps {
 
 const ROUNDS = [
   { key: "FG", label: "Grupos", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+  { key: "16vos", label: "Dieciseisavos", color: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
   { key: "8vos", label: "Octavos", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/20" },
   { key: "CF", label: "Cuartos", color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20" },
   { key: "SF", label: "Semis", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
@@ -177,6 +178,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   }, []);
 
   const knockoutMatches = {
+    "16vos": matches.filter((m) => m.stage === "16vos"),
     "8vos": matches.filter((m) => m.stage === "8vos"),
     CF: matches.filter((m) => m.stage === "CF"),
     SF: matches.filter((m) => m.stage === "SF"),
@@ -444,12 +446,42 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
               <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Fase de Grupos</span>
             </div>
             <div className="grid grid-cols-2 gap-1.5 sm:gap-2 content-start">
-              {["Grupo A", "Grupo B", "Grupo C", "Grupo D", "Grupo E", "Grupo F", "Grupo G", "Grupo H"].map((g) => (
+              {["Grupo A", "Grupo B", "Grupo C", "Grupo D", "Grupo E", "Grupo F", "Grupo G", "Grupo H", "Grupo I", "Grupo J", "Grupo K", "Grupo L"].map((g) => (
                 <div key={g}>
                   <GroupMiniCard groupName={g} />
                 </div>
               ))}
             </div>
+          </motion.div>
+
+          {/* ==================== 16vos ==================== */}
+          <motion.div
+            ref={(el) => {
+              if (el) columnRefs.current.set("16vos", el);
+            }}
+            animate={getColumnAnimation("16vos")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
+          >
+            <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 backdrop-blur-sm mb-2">
+              <span className="text-xs font-black uppercase tracking-widest text-indigo-400">Dieciseisavos</span>
+            </div>
+            <div className="flex-1 flex flex-col">
+              {knockoutMatches["16vos"].map((match, i) => (
+                <div key={match.id} className="flex-1 flex items-center py-1">
+                  <MatchCard match={match} index={i} />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Connector 16vos → 8vos */}
+          <motion.div
+            animate={getColumnAnimation("16vos")}
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="bracket-connector shrink-0 hidden md:flex flex-col"
+          >
+            <KnockoutConnector count={8} />
           </motion.div>
 
           {/* ==================== Octavos ==================== */}

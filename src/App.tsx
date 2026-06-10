@@ -48,27 +48,27 @@ export default function App() {
   }, [theme]);
 
   const [employees, setEmployees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem("fifa_employees_v1");
+    const saved = localStorage.getItem("fifa_employees_v2");
     return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
   });
 
   const [matches, setMatches] = useState<Match[]>(() => {
-    const saved = localStorage.getItem("fifa_matches_v1");
+    const saved = localStorage.getItem("fifa_matches_v2");
     return saved ? JSON.parse(saved) : INITIAL_MATCHES;
   });
 
   const [predictions, setPredictions] = useState<Prediction[]>(() => {
-    const saved = localStorage.getItem("fifa_predictions_v1");
+    const saved = localStorage.getItem("fifa_predictions_v2");
     return saved ? JSON.parse(saved) : PRELOADED_PREDICTIONS;
   });
 
   const [activeEmployeeId, setActiveEmployeeId] = useState<string>(() => {
-    const saved = localStorage.getItem("fifa_active_emp_v1");
+    const saved = localStorage.getItem("fifa_active_emp_v2");
     return saved || "emp1";
   });
 
   const [simulatedTime, setSimulatedTime] = useState<string>(() => {
-    const saved = localStorage.getItem("fifa_simulated_time_v1");
+    const saved = localStorage.getItem("fifa_simulated_time_v2");
     return saved || "2026-06-11T12:00:00"; // Begins day of Opener
   });
 
@@ -76,7 +76,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"ARBOL" | "LISTA">("ARBOL");
 
   // Highlighting specific stage filter under LISTA mode: "FG" | "16vos" | "8vos" | "CF" | "SF" | "F"
-  const [stageFilter, setStageFilter] = useState<"FG" | "8vos" | "CF" | "SF" | "F">("FG");
+  const [stageFilter, setStageFilter] = useState<"FG" | "16vos" | "8vos" | "CF" | "SF" | "F">("FG");
 
   // State for administrative results modal
   const [selectedSimulateMatch, setSelectedSimulateMatch] = useState<Match | null>(null);
@@ -93,23 +93,23 @@ export default function App() {
 
   // Sync state to local storage when changed
   useEffect(() => {
-    localStorage.setItem("fifa_employees_v1", JSON.stringify(employees));
+    localStorage.setItem("fifa_employees_v2", JSON.stringify(employees));
   }, [employees]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_matches_v1", JSON.stringify(matches));
+    localStorage.setItem("fifa_matches_v2", JSON.stringify(matches));
   }, [matches]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_predictions_v1", JSON.stringify(predictions));
+    localStorage.setItem("fifa_predictions_v2", JSON.stringify(predictions));
   }, [predictions]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_active_emp_v1", activeEmployeeId);
+    localStorage.setItem("fifa_active_emp_v2", activeEmployeeId);
   }, [activeEmployeeId]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_simulated_time_v1", simulatedTime);
+    localStorage.setItem("fifa_simulated_time_v2", simulatedTime);
   }, [simulatedTime]);
 
   const triggerToast = (text: string, type: "success" | "info" | "error" = "success") => {
@@ -443,7 +443,7 @@ export default function App() {
 
               {/* Sub Stage Selector BAR */}
               <div id="substage-select-bar" className="flex flex-wrap gap-1 sm:gap-1.5 justify-start bg-slate-950/60 p-1.5 sm:p-2 border border-slate-800 rounded-xl sm:rounded-2xl">
-                {(["FG", "8vos", "CF", "SF", "F"] as const).map((stage) => {
+                {(["FG", "16vos", "8vos", "CF", "SF", "F"] as const).map((stage) => {
                   const isActive = stageFilter === stage;
                   return (
                     <button
@@ -521,9 +521,16 @@ export default function App() {
                         <div>
                           {/* Card top details */}
                           <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pb-2 border-b border-white/5 mb-3">
-                            <span className="flex items-center gap-1">
-                              📅 {match.date} · {match.time}
-                            </span>
+                            <div className="flex flex-col gap-1 items-start">
+                              <span className="flex items-center gap-1">
+                                📅 {match.date} · {match.time}
+                              </span>
+                              {match.venue && (
+                                <span className="text-[10px] text-slate-500 font-sans flex items-center gap-1">
+                                  📍 {match.venue}
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-1.5">
                               {match.groupName && (
                                 <span className="text-xs font-sans text-worldcup-accent bg-worldcup-accent/10 px-2 rounded">
