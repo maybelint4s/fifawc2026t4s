@@ -3,14 +3,15 @@ import { motion } from "motion/react";
 import { X, UserPlus, LogIn, Shield, Globe, Mail, Lock, User } from "lucide-react";
 import { signIn, signUp, adminSignIn } from "../services/auth";
 
-interface AuthModalProps {
-  onClose: () => void;
-}
-
 type AuthMode = "login" | "register" | "admin-login";
 
-export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
-  const [mode, setMode] = useState<AuthMode>("login");
+interface AuthModalProps {
+  onClose: () => void;
+  initialMode?: AuthMode;
+}
+
+export const AuthModal: React.FC<AuthModalProps> = ({ onClose, initialMode = "login" }) => {
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");

@@ -10,6 +10,23 @@ export interface PredictionInput {
 }
 
 /**
+ * Fetch every prediction. Public read is allowed by RLS and powers shared UI.
+ */
+export async function getAllPredictions(): Promise<Prediction[]> {
+  const { data, error } = await supabase
+    .from("predictions")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching predictions:", error);
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
+}
+
+/**
  * Fetch all predictions for the current user.
  */
 export async function getMyPredictions(): Promise<Prediction[]> {

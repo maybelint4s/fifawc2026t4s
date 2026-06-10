@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Team, Match, Employee, Prediction } from "./types";
-import { INITIAL_TEAMS, DEFAULT_EMPLOYEES, INITIAL_MATCHES, PRELOADED_PREDICTIONS } from "./data";
+import { INITIAL_TEAMS, INITIAL_MATCHES } from "./data";
 import { Leaderboard } from "./components/Leaderboard";
 import { ControlCenter } from "./components/ControlCenter";
 import { GroupTables } from "./components/GroupTables";
@@ -32,8 +32,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "./hooks/useAuth";
+import { useProfiles } from "./hooks/useProfiles";
 import { AuthModal } from "./components/AuthModal";
 import { signOut } from "./services/auth";
+import { getAllPredictions, savePrediction } from "./services/predictions";
 import { getMascotPredictionMessage } from "./utils/mascotDialog";
 
 export default function App() {
@@ -57,24 +59,24 @@ export default function App() {
     }
   }, [theme]);
 
-  const [employees, setEmployees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem("fifa_employees_v3");
-    return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
-  });
+  const { profiles, mutate: mutateProfiles } = useProfiles();
+  const employees: Employee[] = profiles.map((profile) => ({
+    id: profile.id,
+    name: profile.name,
+    role: profile.role,
+    avatar: profile.avatar,
+  }));
 
   const [matches, setMatches] = useState<Match[]>(() => {
     const saved = localStorage.getItem("fifa_matches_v3");
     return saved ? JSON.parse(saved) : INITIAL_MATCHES;
   });
 
-  const [predictions, setPredictions] = useState<Prediction[]>(() => {
-    const saved = localStorage.getItem("fifa_predictions_v3");
-    return saved ? JSON.parse(saved) : PRELOADED_PREDICTIONS;
-  });
+  const [predictions, setPredictions] = useState<Prediction[]>([]);
 
   const [activeEmployeeId, setActiveEmployeeId] = useState<string>(() => {
     const saved = localStorage.getItem("fifa_active_emp_v3");
-    return saved || "emp1";
+    return saved || "";
   });
 
   // Real-time locking: uses actual system time (new Date()) instead of simulated time
@@ -88,6 +90,7 @@ export default function App() {
   // Auth state from Supabase
   const { user, isAdmin, isLoading: authLoading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<"login" | "register" | "admin-login">("login");
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [hasAutoOpenedAdminPanel, setHasAutoOpenedAdminPanel] = useState(false);
@@ -116,20 +119,37 @@ export default function App() {
 
   // Sync state to local storage when changed
   useEffect(() => {
-    localStorage.setItem("fifa_employees_v3", JSON.stringify(employees));
-  }, [employees]);
-
-  useEffect(() => {
     localStorage.setItem("fifa_matches_v3", JSON.stringify(matches));
   }, [matches]);
 
   useEffect(() => {
-    localStorage.setItem("fifa_predictions_v3", JSON.stringify(predictions));
-  }, [predictions]);
-
-  useEffect(() => {
     localStorage.setItem("fifa_active_emp_v3", activeEmployeeId);
   }, [activeEmployeeId]);
+
+  useEffect(() => {
+    getAllPredictions()
+      .then((rows) => {
+        setPredictions(
+          rows.map((row) => ({
+            matchId: row.match_id,
+            employeeId: row.user_id,
+            predictedScoreA: row.predicted_score_a,
+            predictedScoreB: row.predicted_score_b,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("No se pudieron cargar las predicciones:", error);
+      });
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.id) {
+      setActiveEmployeeId(user.id);
+    } else {
+      setActiveEmployeeId("");
+    }
+  }, [user?.id]);
 
   // (simulatedTime storage removed)
 
@@ -158,18 +178,21 @@ export default function App() {
     }
   };
 
-  const handleAddEmployee = (name: string, role: string, avatar: string) => {
-    const newId = `emp_${Date.now()}`;
-    const newEmp: Employee = { id: newId, name, role, avatar };
-    setEmployees((prev) => [...prev, newEmp]);
-    setActiveEmployeeId(newId);
-    triggerToast(`¡Bienvenido ${name} al Prode de la Empresa! Se ha creado tu perfil.`, "success");
+  const openAuthModal = (mode: "login" | "register" | "admin-login" = "login") => {
+    setAuthModalMode(mode);
+    setShowAuthModal(true);
   };
 
   // (handleChangeSimulatedTime removed)
 
   // Add/Update prediction
-  const handleUpdatePrediction = (matchId: string, scoreA: number, scoreB: number) => {
+  const handleUpdatePrediction = async (matchId: string, scoreA: number, scoreB: number) => {
+    if (!user) {
+      openAuthModal("login");
+      triggerToast("Debes iniciar sesión para guardar tu predicción.", "error");
+      return;
+    }
+
     // Double check if locked based on simulated time
     const match = matches.find((m) => m.id === matchId);
     if (!match) return;
@@ -180,16 +203,24 @@ export default function App() {
       return;
     }
 
+    try {
+      await savePrediction({ matchId, predictedScoreA: scoreA, predictedScoreB: scoreB });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "No se pudo guardar la predicción.";
+      triggerToast(message, "error");
+      return;
+    }
+
     setPredictions((prev) => {
       // Check if already exists
       const filtered = prev.filter(
-        (p) => !(p.matchId === matchId && p.employeeId === activeEmployeeId)
+        (p) => !(p.matchId === matchId && p.employeeId === user.id)
       );
       return [
         ...filtered,
         {
           matchId,
-          employeeId: activeEmployeeId,
+          employeeId: user.id,
           predictedScoreA: scoreA,
           predictedScoreB: scoreB,
         },
@@ -200,6 +231,10 @@ export default function App() {
 
   // Open administrative simulate dialog
   const handleOpenSimulateModal = (match: Match) => {
+    if (!isAdmin) {
+      triggerToast("Solo el administrador puede registrar resultados oficiales.", "error");
+      return;
+    }
     setSelectedSimulateMatch(match);
     setAdminScoreA(match.scoreA ?? 0);
     setAdminScoreB(match.scoreB ?? 0);
@@ -209,6 +244,10 @@ export default function App() {
 
   // Reset all matches and standings simulation back to default
   const handleResetSimulation = () => {
+    if (!isAdmin) {
+      triggerToast("Solo el administrador puede reiniciar resultados.", "error");
+      return;
+    }
     if (window.confirm("¿Seguro que deseas reiniciar todos los resultados del Mundial a su estado inicial? Se conservarán los participantes y predicciones.")) {
       setMatches(INITIAL_MATCHES);
       triggerToast("Resultados oficiales reiniciados. ¡El árbol volvió al estado pendiente!", "info");
@@ -231,7 +270,7 @@ export default function App() {
 
   // Submit Administrative real outcome
   const handleSaveRealScore = () => {
-    if (!selectedSimulateMatch) return;
+    if (!selectedSimulateMatch || !isAdmin) return;
 
     const matchId = selectedSimulateMatch.id;
     let winnerId = "";
@@ -375,7 +414,7 @@ export default function App() {
             {/* Reset simulator state */}
             <button
               onClick={handleResetSimulation}
-              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-red-950/40 hover:bg-red-950/20 text-red-400 text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all"
+              className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-red-950/40 hover:bg-red-950/20 text-red-400 text-[11px] sm:text-xs font-semibold items-center gap-1.5 transition-all ${isAdmin ? "flex" : "hidden"}`}
               title="Volver los marcadores reales a pendientes"
             >
               <Undo className="w-3.5 h-3.5" />
@@ -411,7 +450,7 @@ export default function App() {
               </div>
             ) : (
               <button
-                onClick={() => setShowAuthModal(true)}
+                onClick={() => openAuthModal("login")}
                 className="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all"
                 title="Iniciar sesión"
               >
@@ -513,6 +552,7 @@ export default function App() {
                 activeEmployeeId={activeEmployeeId}
                 onUpdatePrediction={handleUpdatePrediction}
                 onOpenSimulationModal={handleOpenSimulateModal}
+                canManageResults={isAdmin}
               />
             </div>
           )}
@@ -739,12 +779,14 @@ export default function App() {
                         </div>
 
                         {/* Admin Trigger */}
+                        {isAdmin && (
                         <button
                           onClick={() => handleOpenSimulateModal(match)}
                           className="mt-3 py-1 bg-slate-950 text-slate-400 hover:text-white hover:bg-slate-900/40 border border-slate-900 rounded-lg text-xs font-mono transition-all text-center block w-full"
                         >
                           ⚙️ Registrar Resultado Oficial
                         </button>
+                        )}
                       </div>
                     );
                   })}
@@ -769,8 +811,8 @@ export default function App() {
           <ControlCenter
             employees={employees}
             activeEmployeeId={activeEmployeeId}
-            onSelectEmployee={handleSelectEmployee}
-            onAddEmployee={handleAddEmployee}
+            onJoin={() => openAuthModal("register")}
+            isAuthenticated={Boolean(user)}
           />
 
           {/* Dynamic leaderboard ranking table */}
@@ -931,7 +973,13 @@ export default function App() {
       {/* Auth Modal */}
       <AnimatePresence>
         {showAuthModal && (
-          <AuthModal onClose={() => setShowAuthModal(false)} />
+          <AuthModal
+            initialMode={authModalMode}
+            onClose={() => {
+              setShowAuthModal(false);
+              mutateProfiles();
+            }}
+          />
         )}
       </AnimatePresence>
 

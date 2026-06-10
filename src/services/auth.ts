@@ -5,6 +5,40 @@ export interface AuthError {
   message: string;
 }
 
+async function ensureUserProfile(user: User, fallbackName?: string, fallbackAvatar = "👤") {
+  const { data: existingProfile, error: selectError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (selectError) {
+    console.error("Error checking profile:", selectError);
+    return;
+  }
+
+  if (existingProfile) return;
+
+  const metadata = user.user_metadata ?? {};
+  const name =
+    fallbackName?.trim() ||
+    (typeof metadata.name === "string" ? metadata.name : "") ||
+    user.email?.split("@")[0] ||
+    "Participante";
+  const avatar = (typeof metadata.avatar === "string" ? metadata.avatar : "") || fallbackAvatar;
+
+  const { error: profileError } = await supabase.from("profiles").insert({
+    id: user.id,
+    name,
+    avatar,
+    role: "Employee",
+  });
+
+  if (profileError) {
+    console.error("Error creating profile:", profileError);
+  }
+}
+
 /**
  * Validate that the email domain is in the allowed list.
  * If no domains are configured, allows all (open mode).
@@ -61,16 +95,7 @@ export async function signUp(
 
   // Auto-create profile if user was created
   if (data.user) {
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: data.user.id,
-      name,
-      avatar,
-      role: "Employee",
-    });
-
-    if (profileError) {
-      console.error("Error creating profile:", profileError);
-    }
+    await ensureUserProfile(data.user, name, avatar);
   }
 
   return { user: data.user ?? null, error: null };
@@ -90,6 +115,10 @@ export async function signIn(
 
   if (error) {
     return { user: null, error: { message: error.message } };
+  }
+
+  if (data.user) {
+    await ensureUserProfile(data.user);
   }
 
   return { user: data.user ?? null, error: null };

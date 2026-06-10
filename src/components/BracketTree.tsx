@@ -13,6 +13,7 @@ interface BracketTreeProps {
   activeEmployeeId: string;
   onUpdatePrediction: (matchId: string, teamAVal: number, teamBVal: number) => void;
   onOpenSimulationModal: (match: Match) => void;
+  canManageResults?: boolean;
 }
 
 const ROUNDS = [
@@ -53,6 +54,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   activeEmployeeId,
   onUpdatePrediction,
   onOpenSimulationModal,
+  canManageResults = false,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -348,12 +350,14 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
             )}
           </div>
 
+          {canManageResults && (
           <button
             onClick={() => onOpenSimulationModal(match)}
             className="mt-2 w-full text-center py-1 rounded bg-slate-900/60 hover:bg-slate-950/90 border border-white/5 hover:border-slate-700 text-[11px] font-medium text-slate-300 transition-colors"
           >
             ⚙️ Gestionar Resultado
           </button>
+          )}
         </div>
       </motion.div>
     );
