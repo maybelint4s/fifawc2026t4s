@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import { Match, Prediction, Employee } from "../types";
 import { INITIAL_TEAMS } from "../data";
 import { Lock, Unlock, Users } from "lucide-react";
@@ -17,13 +17,18 @@ interface BracketTreeProps {
 }
 
 const ROUNDS = [
-  { key: "FG", label: "Grupos", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-  { key: "16vos", label: "Dieciseisavos", color: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
-  { key: "8vos", label: "Octavos", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/20" },
-  { key: "CF", label: "Cuartos", color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20" },
-  { key: "SF", label: "Semis", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-  { key: "F", label: "Final", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
+  { key: "FG", label: "Grupos", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", pill: "bg-emerald-400" },
+  { key: "16vos", label: "Dieciseisavos", color: "text-indigo-400", bg: "bg-indigo-500/10", border: "border-indigo-500/20", pill: "bg-indigo-400" },
+  { key: "8vos", label: "Octavos", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/20", pill: "bg-sky-400" },
+  { key: "CF", label: "Cuartos", color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", pill: "bg-violet-400" },
+  { key: "SF", label: "Semis", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", pill: "bg-purple-400" },
+  { key: "F", label: "Final", color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", pill: "bg-yellow-400" },
 ] as const;
+
+// Spring transitions (values from prompt-bracket-arbol.md)
+const TRACK_SPRING = { type: "spring", stiffness: 85, damping: 18, mass: 0.9 } as const;
+const LANE_SPRING = { type: "spring", stiffness: 120, damping: 20 } as const;
+const PILL_SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 
 /* ============================================================
    Connector between two knockout rounds.
@@ -56,14 +61,11 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
   onOpenSimulationModal,
   canManageResults = false,
 }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const [activeRound, setActiveRound] = useState<string>("FG");
-  const [focusMode, setFocusMode] = useState(false);
-  const dragStart = useRef({ x: 0, scrollLeft: 0 });
+  const [x, setX] = useState(0);
   const columnRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const hasAnimated = useRef(false);
-  const isDrag = useRef(false);
 
   const isMatchLocked = (match: Match): boolean => {
     return match.status === "Finished" || match.status === "Live" || new Date() >= new Date(match.datetimeISO);
@@ -105,54 +107,30 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     [matches]
   );
 
-  const scrollToRound = useCallback(
-    (roundKey: string) => {
-      setActiveRound(roundKey);
-      // Clicking "Grupos" resets to the initial full-tree view (zoom out)
-      setFocusMode(roundKey !== "FG");
-      const col = columnRefs.current.get(roundKey);
-      const container = scrollRef.current;
-      if (!col || !container) return;
-      const target = col.offsetLeft - container.offsetLeft;
-      container.scrollTo({ left: target, behavior: "smooth" });
-    },
-    []
-  );
+  // --- Horizontal zoom effect: translate the track to center the active lane ---
+  // Uses offsetLeft/offsetWidth (layout metrics) so the measurement is stable
+  // even while the lanes are scaled via transform.
+  const recompute = useCallback(() => {
+    const vp = viewportRef.current;
+    const lane = columnRefs.current.get(activeRound);
+    if (!vp || !lane) return;
+    const center = lane.offsetLeft + lane.offsetWidth / 2;
+    setX(vp.clientWidth / 2 - center);
+  }, [activeRound]);
 
-  const onPointerDown = (e: React.PointerEvent) => {
-    isDrag.current = false;
-    setIsDragging(true);
-    dragStart.current = { x: e.clientX, scrollLeft: scrollRef.current?.scrollLeft || 0 };
-  };
+  useLayoutEffect(() => {
+    recompute();
+  }, [recompute]);
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const dx = e.clientX - dragStart.current.x;
-    if (Math.abs(dx) > 5) isDrag.current = true;
-    if (isDrag.current) setFocusMode(false);
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = dragStart.current.scrollLeft - dx * 1.2;
-    }
-  };
+  useEffect(() => {
+    window.addEventListener("resize", recompute);
+    return () => window.removeEventListener("resize", recompute);
+  }, [recompute]);
 
-  const onPointerUp = () => {
-    setIsDragging(false);
-    if (!isDrag.current) return;
-    const container = scrollRef.current;
-    if (!container) return;
-    let closest = "FG";
-    let minDist = Infinity;
-    ROUNDS.forEach((r) => {
-      const col = columnRefs.current.get(r.key);
-      if (!col) return;
-      const dist = Math.abs(col.offsetLeft - container.scrollLeft);
-      if (dist < minDist) {
-        minDist = dist;
-        closest = r.key;
-      }
-    });
-    setActiveRound(closest);
-  };
+  // Focus a round (from a pill or by clicking a non-active lane).
+  const focusRound = useCallback((roundKey: string) => {
+    setActiveRound(roundKey);
+  }, []);
 
   // Anime.js entrance animation (connectors + group cards)
   useEffect(() => {
@@ -174,9 +152,11 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
         delay: stagger(100, { from: "first" }),
         ease: "inOutCubic",
       });
+      // Lanes may have shifted after the entrance; re-center the active one.
+      recompute();
     }, 120);
     return () => clearTimeout(t);
-  }, []);
+  }, [recompute]);
 
   const knockoutMatches = {
     "16vos": matches.filter((m) => m.stage === "16vos"),
@@ -186,21 +166,18 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     F: matches.filter((m) => m.stage === "F"),
   };
 
-  const getColumnAnimation = (roundKey: string) => {
-    if (!focusMode) {
-      return { scale: 1, opacity: 1, filter: "blur(0px)" };
-    }
+  // Scale/opacity of a lane based on its distance to the active round.
+  // Active: scale 1 / opacity 1. Others shrink + dim proportionally (depth).
+  const laneAnim = (roundKey: string) => {
     const activeIndex = ROUNDS.findIndex((r) => r.key === activeRound);
     const colIndex = ROUNDS.findIndex((r) => r.key === roundKey);
     const dist = Math.abs(activeIndex - colIndex);
-
-    if (dist === 0) {
-      return { scale: 1, opacity: 1, filter: "blur(0px)" };
-    }
-    if (dist === 1) {
-      return { scale: 0.9, opacity: 0.25, filter: "blur(4px)" };
-    }
-    return { scale: 0.8, opacity: 0, filter: "blur(8px)" };
+    const isActive = dist === 0;
+    return {
+      scale: isActive ? 1 : Math.max(0.78, 0.9 - dist * 0.04),
+      opacity: isActive ? 1 : Math.max(0.28, 0.55 - dist * 0.1),
+      filter: isActive ? "saturate(1)" : "saturate(0.65)",
+    };
   };
 
   const MatchCard = ({ match, index }: { match: Match; index: number }) => {
@@ -236,7 +213,7 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
               {locked ? "Cerrado" : "Abierto"}
             </span>
           </div>
-          {/* Teams */}
+          {/* Teams */}
           <div className="space-y-1.5 mb-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
@@ -403,47 +380,71 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
     );
   };
 
+  // Wraps a round lane: registers its ref, applies the depth animation and
+  // makes non-active lanes clickable to focus them.
+  const Lane = ({ roundKey, className, children }: { roundKey: string; className?: string; children: React.ReactNode }) => {
+    const isActive = activeRound === roundKey;
+    return (
+      <motion.div
+        ref={(el) => {
+          if (el) columnRefs.current.set(roundKey, el);
+        }}
+        onClick={() => !isActive && focusRound(roundKey)}
+        animate={laneAnim(roundKey)}
+        transition={LANE_SPRING}
+        className={`bracket-round-column origin-center shrink-0 ${isActive ? "" : "cursor-pointer"} ${className ?? ""}`}
+      >
+        {children}
+      </motion.div>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 select-none">
-      {/* Navigation Buttons */}
-      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 bracket-nav-scroll">
-        {ROUNDS.map((r) => {
-          const isActive = activeRound === r.key;
-          return (
-            <button
-              key={r.key}
-              onClick={() => scrollToRound(r.key)}
-              className={`flex-shrink-0 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider border transition-all duration-300 ${
-                isActive
-                  ? `${r.bg} ${r.color} ${r.border} shadow-lg scale-105`
-                  : "bg-slate-900/50 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white"
-              }`}
-            >
-              {r.label}
-            </button>
-          );
-        })}
+      {/* Round pills — control, with a sliding active background (layoutId) */}
+      <div className="flex justify-center">
+        <div className="flex items-center gap-1 overflow-x-auto rounded-full border border-slate-800 bg-slate-950/60 p-1 bracket-nav-scroll max-w-full">
+          {ROUNDS.map((r) => {
+            const isActive = activeRound === r.key;
+            return (
+              <button
+                key={r.key}
+                onClick={() => focusRound(r.key)}
+                className={`relative flex-shrink-0 rounded-full px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors ${
+                  isActive ? "text-slate-950" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="bracket-round-pill"
+                    className={`absolute inset-0 rounded-full ${r.pill}`}
+                    transition={PILL_SPRING}
+                  />
+                )}
+                <span className="relative z-10">{r.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Horizontal Scroll Tree */}
+      <p className="text-center text-[10px] sm:text-[11px] text-slate-500 font-sans -mt-1">
+        Toca una ronda o un carril para acercarte.
+      </p>
+
+      {/* Viewport + sliding track (centers the active lane via translateX) */}
       <div
-        ref={scrollRef}
-        className="bracket-scroll-container relative rounded-2xl border border-slate-800/60 bg-slate-950/30"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
+        ref={viewportRef}
+        className="bracket-scroll-container relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-950/30"
       >
-        <div className="flex items-stretch px-2 sm:px-4 py-4 sm:py-6 gap-2 min-h-[500px] sm:min-h-[620px]">
+        <motion.div
+          className="relative flex items-stretch gap-2 py-4 sm:py-6 min-h-[500px] sm:min-h-[620px]"
+          style={{ paddingInline: "12vw" }}
+          animate={{ x }}
+          transition={TRACK_SPRING}
+        >
           {/* ==================== FG Column ==================== */}
-          <motion.div
-            ref={(el) => {
-              if (el) columnRefs.current.set("FG", el);
-            }}
-            animate={getColumnAnimation("FG")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[220px] sm:w-[280px] md:w-[300px] flex flex-col gap-2 sm:gap-3 shrink-0"
-          >
+          <Lane roundKey="FG" className="w-[220px] sm:w-[280px] md:w-[300px] flex flex-col gap-2 sm:gap-3">
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-sm">
               <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Fase de Grupos</span>
             </div>
@@ -454,17 +455,10 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </motion.div>
+          </Lane>
 
           {/* ==================== 16vos ==================== */}
-          <motion.div
-            ref={(el) => {
-              if (el) columnRefs.current.set("16vos", el);
-            }}
-            animate={getColumnAnimation("16vos")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
-          >
+          <Lane roundKey="16vos" className="w-[200px] sm:w-[240px] md:w-[260px] flex flex-col">
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-indigo-400">Dieciseisavos</span>
             </div>
@@ -475,26 +469,15 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </motion.div>
+          </Lane>
 
           {/* Connector 16vos → 8vos */}
-          <motion.div
-            animate={getColumnAnimation("16vos")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-connector shrink-0 hidden md:flex flex-col"
-          >
+          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
             <KnockoutConnector count={8} />
-          </motion.div>
+          </div>
 
           {/* ==================== Octavos ==================== */}
-          <motion.div
-            ref={(el) => {
-              if (el) columnRefs.current.set("8vos", el);
-            }}
-            animate={getColumnAnimation("8vos")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
-          >
+          <Lane roundKey="8vos" className="w-[200px] sm:w-[240px] md:w-[260px] flex flex-col">
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-sky-500/20 bg-sky-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-sky-400">Octavos de Final</span>
             </div>
@@ -505,26 +488,15 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </motion.div>
+          </Lane>
 
           {/* Connector 8vos → CF */}
-          <motion.div
-            animate={getColumnAnimation("8vos")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-connector shrink-0 hidden md:flex flex-col"
-          >
+          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
             <KnockoutConnector count={4} />
-          </motion.div>
+          </div>
 
           {/* ==================== Cuartos ==================== */}
-          <motion.div
-            ref={(el) => {
-              if (el) columnRefs.current.set("CF", el);
-            }}
-            animate={getColumnAnimation("CF")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
-          >
+          <Lane roundKey="CF" className="w-[200px] sm:w-[240px] md:w-[260px] flex flex-col">
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-violet-500/20 bg-violet-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-violet-400">Cuartos de Final</span>
             </div>
@@ -535,26 +507,15 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </motion.div>
+          </Lane>
 
           {/* Connector CF → SF */}
-          <motion.div
-            animate={getColumnAnimation("CF")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-connector shrink-0 hidden md:flex flex-col"
-          >
+          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
             <KnockoutConnector count={2} />
-          </motion.div>
+          </div>
 
           {/* ==================== Semis ==================== */}
-          <motion.div
-            ref={(el) => {
-              if (el) columnRefs.current.set("SF", el);
-            }}
-            animate={getColumnAnimation("SF")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[200px] sm:w-[240px] md:w-[260px] flex flex-col shrink-0"
-          >
+          <Lane roundKey="SF" className="w-[200px] sm:w-[240px] md:w-[260px] flex flex-col">
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-purple-500/20 bg-purple-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-purple-400">Semifinales</span>
             </div>
@@ -565,26 +526,15 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </motion.div>
+          </Lane>
 
           {/* Connector SF → F */}
-          <motion.div
-            animate={getColumnAnimation("SF")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-connector shrink-0 hidden md:flex flex-col"
-          >
+          <div className="bracket-connector shrink-0 hidden md:flex flex-col">
             <KnockoutConnector count={1} />
-          </motion.div>
+          </div>
 
           {/* ==================== Final ==================== */}
-          <motion.div
-            ref={(el) => {
-              if (el) columnRefs.current.set("F", el);
-            }}
-            animate={getColumnAnimation("F")}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="bracket-round-column w-[220px] sm:w-[260px] md:w-[280px] flex flex-col shrink-0 pr-2 sm:pr-4"
-          >
+          <Lane roundKey="F" className="w-[220px] sm:w-[260px] md:w-[280px] flex flex-col">
             <div className="sticky top-0 z-10 text-center py-2 rounded-xl border border-yellow-500/20 bg-yellow-500/10 backdrop-blur-sm mb-2">
               <span className="text-xs font-black uppercase tracking-widest text-yellow-400">🏆 Finales</span>
             </div>
@@ -600,8 +550,12 @@ export const BracketTree: React.FC<BracketTreeProps> = ({
                 </div>
               ))}
             </div>
-          </motion.div>
-        </div>
+          </Lane>
+        </motion.div>
+
+        {/* Edge fade (depth cue) */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-slate-950 to-transparent z-20" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-slate-950 to-transparent z-20" />
       </div>
     </div>
   );
